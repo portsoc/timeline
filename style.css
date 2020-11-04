@@ -12,6 +12,7 @@
   --barcolor: var(--purple);
   --barfg: var(--bg);
   --taskbg: #61135f33;
+  --unit: 24px;
 
 }
 
@@ -23,7 +24,7 @@
 }
 
 body {
-  font-size: 150%;
+  font-size: var(--unit);
   font-family: var(--face);
   display: grid;
   grid-template: var(--grid);
