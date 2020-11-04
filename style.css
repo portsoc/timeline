@@ -1,0 +1,81 @@
+:root {
+  --purple: #61135f;
+  --blue: #009fff;
+  --bg: #fff;
+  --fg: #000;
+  --grid:
+    "title title" auto
+    "control output" 1fr
+    / 1fr 1fr;
+  --face: 'Helvetica Neue', 'sans serif';
+
+  --barcolor: var(--purple);
+  --barfg: var(--bg);
+  --taskbg: #61135f33;
+
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: var(--face);
+}
+
+body {
+  font-size: 150%;
+  font-family: var(--face);
+  display: grid;
+  grid-template: var(--grid);
+  overflow: hidden;
+  color: var(--fg);
+  background-color: var(--bg);
+}
+
+body>* {
+  padding: 1rem;
+}
+
+main, section {
+  grid-area: control;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+}
+
+main>label {
+  padding-top: 1rem;
+}
+
+input {
+  font-size: 80%;
+  width: 10em;
+}
+
+body>h1 {
+  grid-area: title;
+  background-color: var(--purple);
+  color: var(--bg);
+}
+
+svg {
+  grid-area: output;
+  background: var(--bg);
+}
+
+#bar {
+  fill: var(--barcolor);
+}
+
+.month-marker {
+  fill: var(--barfg);
+  font-weight: bold;
+}
+
+section {
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  background: var(--taskbg);
+  border-radius: 0.25rem;
+  border: grey thin solid;
+}

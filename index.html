@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="style.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Timeline Generator</title>
+
+<h1>Timeline Generator</h1>
+
+<main>
+  <section>
+    <h2>Timeline</h2>
+    <label>
+      <input id="datefrom" type="date" value="2021-09-01"></input>
+      Start Date
+    </label>
+    <label>
+      <input id="dateto" type="date" value="2022-02-01"></input>
+      End Date
+    </label>
+    <label>
+      <input id="daywidth" type=range min=4 max=40 value=20></input>
+      Scale
+    </label>
+  </section>
+
+  <section>
+    <h2>Task</h2>
+    <label>
+      <input name="taskname" type="text" placeholder="Task name"></input>
+      Name
+    </label>
+    <label>
+      <input name="taskdatefrom" type="date" value="2021-09-01"></input>
+      Start Date
+    </label>
+    <label>
+      <input name="taskdateto" type="date" value="2022-02-01"></input>
+      End Date
+    </label>
+    <label>
+      <input name="taskbg" type="color" value="2022-02-01"></input>
+      Background
+    </label>
+    <label>
+      <input name="taskfg" type="color" value="2022-02-01"></input>
+      Foreground
+    </label>
+    <label>
+      <input name="tasklayer" type="number" value="1"></input>
+      Layer
+    </label>
+
+
+
+  </section>
+
+</main>
+
+
+
+<svg id=timeline width=1000 height=600>
+  <path id="bar" d="M0,100 L900,100 L925,125 L900,150 L0,150 z"></path>
+  <text x="80" y="80">anywhere</text>
+</svg>
+
+<script>
+  // get a handle on envery element in the
+  // page for safe shorthand use
+  const el = {};
+  document.querySelectorAll("[id]").forEach( e => el[e.id] = e );
+
+  el.datefrom.addEventListener("change", redraw);
+  el.dateto.addEventListener("change", redraw);
+  el.daywidth.addEventListener("input", redraw);
+
+  function redraw() {
+    el.timeline.width = Math.random() * 500;
+    el.timeline.textContent = ''; // remove all content
+
+    const startDate = el.datefrom.valueAsDate;
+    const endDate = el.dateto.valueAsDate;
+
+    const firstDate = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+    const lastDate = new Date(new Date(endDate.getFullYear(), endDate.getMonth()+1, 1)-24*60*60*1000);
+
+    const dayWidth = el.daywidth.value/4;
+
+    const days = (lastDate - firstDate) / 1000 / 24 / 60 / 60 * dayWidth;
+    const barHeight = 50;
+    const halfBarHeight = barHeight/2;
+    const taskHeight = barHeight * 2 / 3;
+
+    const barEl = svg('path', {
+      id: 'bar',
+      d: `M0,100 L${days},100 L${days+halfBarHeight},${100+halfBarHeight} L${days},${100+barHeight} L0,${100+barHeight} z`,
+    });
+    el.timeline.append(barEl);
+
+    const MONTHS = [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec' ];
+
+
+    for (let monthStart = firstDate; monthStart < lastDate; monthStart = getNextMonthStart(monthStart)) {
+      const text = MONTHS[monthStart.getMonth()];
+      const monthMarker = svg('text', {
+        transform: `translate(${dateX(monthStart)+15},145) rotate(-45)`,
+        class: 'month-marker'
+      });
+      // todo reconsider 15 above so dates align with months somehow
+      monthMarker.textContent = text;
+      el.timeline.append(monthMarker);
+    }
+
+    const tasks = [
+      {
+        name: 'foo',
+        start: startDate,
+        end: endDate,
+        bg: '#8ff',
+        color: '#000',
+        layer: 0,
+      },
+      {
+        name: 'foo',
+        start: startDate,
+        end: new Date(Number(startDate) + (endDate - startDate)/2),
+        bg: '#ff8',
+        color: '#000',
+        layer: 1,
+      },
+    ]
+
+    for (const task of tasks) {
+      const y = task.layer * barHeight + 100 + barHeight + halfBarHeight;
+      const x1 = dateX(task.start);
+      const x2 = dateX(task.end);
+      const barEl = svg('path', {
+        class: 'task',
+        d: `M${x1},${y} L${x2},${y} L${x2},${y+taskHeight} L${x1},${y+taskHeight} z`,
+        fill: task.bg,
+      });
+      el.timeline.append(barEl);
+    }
+
+    function dateX(date) {
+      return dayDiff(firstDate, date)*dayWidth;
+    }
+
+  }
+
+  redraw();
+
+  function dayDiff(date1, date2) {
+    return (date2 - date1) / 1000 / 24 / 60 / 60;
+  }
+
+  function getNextMonthStart(date) {
+    return new Date(date.getFullYear(), date.getMonth()+1, 1);
+  }
+
+  /*
+   * create a DOM element
+   * options can contain `id`, `classes`
+   */
+  function svg(name, attributes = {}, classes = '') {
+    const el = document.createElementNS('http://www.w3.org/2000/svg', name);
+    for (const attr of Object.keys(attributes)) {
+      el.setAttribute(attr, attributes[attr]);
+    }
+    return el;
+  }
+
+</script>
