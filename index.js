@@ -4,6 +4,7 @@
 const UNIT = 24;
 const DAY_MILLIS = 1000*60*60*24;
 const tasks = [];
+const keyDates = [];
 const el = {};
 
 window.addEventListener('load', init);
@@ -16,7 +17,6 @@ function init() {
   redraw();
 }
 
-
 function redraw() {
   el.timeline.textContent = ''; // remove all content
 
@@ -24,6 +24,7 @@ function redraw() {
   const endDate = el.dateto.valueAsDate;
 
   addDummyTasks();
+  addDummyKeyDates();
 
   const firstDate = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
   const lastDate = new Date(new Date(endDate.getFullYear(), endDate.getMonth()+1, 1)-24*60*60*1000);
@@ -63,6 +64,11 @@ function redraw() {
     drawTask(task);
   }
 
+  for (const keyDate of keyDates) {
+    drawKeyDate(keyDate);
+  }
+
+
   function drawTask(task) {
     const y = task.layer * taskHeight + 100 + barHeight + halfBarHeight;
     const x1 = dateX(task.start);
@@ -76,6 +82,25 @@ function redraw() {
     const textEl = svg('text', {x: x1+pad, y: y+taskHeight/2+pad, style: `fill: ${task.color}`});
     textEl.textContent = task.name; 
     g.append(barEl, textEl);
+    el.timeline.append(g);
+  }
+
+  function drawKeyDate(keyDate) {
+    const y = 100;
+    const x1 = dateX(keyDate.date);
+    const g = svg('g', {class: 'key-date'});
+    const style = keyDate.color ? `fill: ${keyDate.color}` : '';
+
+    const dateEl = svg('text', {x: x1, y: y-taskHeight, style, class: 'date'});
+    dateEl.textContent = keyDate.date.getDate(); 
+    
+    const nameEl = svg('text', {
+      transform: `translate(${x1+UNIT/2},${y-taskHeight*2}) rotate(-45)`,
+      style,
+    });
+    nameEl.textContent = keyDate.name; 
+    
+    g.append(dateEl, nameEl);
     el.timeline.append(g);
   }
 
@@ -118,6 +143,25 @@ function redraw() {
     });
   }
   
+  function addDummyKeyDates() {
+    keyDates.push({
+      name: 'First',
+      date: startDate,
+      color: 'red',
+    });
+    keyDates.push({
+      name: 'Something',
+      date: new Date(Number(startDate) + 40 * DAY_MILLIS),
+    });
+    keyDates.push({
+      name: 'Another Thing',
+      date: new Date(Number(startDate) + 80 * DAY_MILLIS),
+    });
+    keyDates.push({
+      name: 'Last Deadline',
+      date: endDate,
+    });
+  }
 
 }
 

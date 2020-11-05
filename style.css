@@ -89,6 +89,15 @@ svg {
   dominant-baseline: middle;
 }
 
+.key-date {
+  fill: var(--purple);
+}
+
+.key-date .date {
+  font-weight: bold;
+}
+
+
 section {
   margin-bottom: 0.5rem;
   padding: 0.5rem;
