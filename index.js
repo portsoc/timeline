@@ -74,15 +74,19 @@ function redraw() {
 
   function drawTask(task) {
     const y = task.layer * taskHeight + vert_offset + barHeight + halfBarHeight;
-    const x1 = dateX(task.start);
-    const x2 = dateX(task.end);
+    const x = dateX(task.start);
+    const width = dateX(task.end) - x;
     const g = svg('g', {class: 'task'});
-    const barEl = svg('path', {
-      class: 'task',
-      d: `M${x1},${y} L${x2},${y} L${x2},${y+taskHeight} L${x1},${y+taskHeight} z`,
+    const barEl = svg('rect', {
+      class: 'rect',
+      x,
+      y,
+      width,
+      height: taskHeight,
+      rx: 4,
       fill: task.bg,
     });
-    const textEl = svg('text', {x: x1+pad, y: y+taskHeight/2+pad, style: `fill: ${task.color}`});
+    const textEl = svg('text', {x: x+pad, y: y+taskHeight/2+pad, style: `fill: ${task.color}`});
     textEl.textContent = task.name; 
     g.append(barEl, textEl);
     el.timeline.append(g);
