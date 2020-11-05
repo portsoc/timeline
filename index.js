@@ -7,6 +7,9 @@ const tasks = [];
 const keyDates = [];
 const el = {};
 
+let vert_offset = 300; // todo auto adjust this
+
+
 window.addEventListener('load', init);
 
 function init() {
@@ -42,7 +45,7 @@ function redraw() {
 
   const barEl = svg('path', {
     id: 'bar',
-    d: `M0,100 L${days},100 L${days+halfBarHeight},${100+halfBarHeight} L${days},${100+barHeight} L0,${100+barHeight} z`,
+    d: `M0,${vert_offset} L${days},${vert_offset} L${days+halfBarHeight},${vert_offset+halfBarHeight} L${days},${vert_offset+barHeight} L0,${vert_offset+barHeight} z`,
   });
   el.timeline.append(barEl);
 
@@ -52,7 +55,7 @@ function redraw() {
   for (let monthStart = firstDate; monthStart < lastDate; monthStart = getNextMonthStart(monthStart)) {
     const text = MONTHS[monthStart.getMonth()];
     const monthMarker = svg('text', {
-      transform: `translate(${dateX(monthStart)+offset},${100+barHeight-pad}) rotate(-45)`,
+      transform: `translate(${dateX(monthStart)+offset},${vert_offset+barHeight-pad}) rotate(-45)`,
       class: 'month-marker'
     });
     // todo reconsider 15 above so dates align with months somehow
@@ -70,7 +73,7 @@ function redraw() {
 
 
   function drawTask(task) {
-    const y = task.layer * taskHeight + 100 + barHeight + halfBarHeight;
+    const y = task.layer * taskHeight + vert_offset + barHeight + halfBarHeight;
     const x1 = dateX(task.start);
     const x2 = dateX(task.end);
     const g = svg('g', {class: 'task'});
@@ -86,7 +89,7 @@ function redraw() {
   }
 
   function drawKeyDate(keyDate) {
-    const y = 100;
+    const y = vert_offset;
     const x1 = dateX(keyDate.date);
     const g = svg('g', {class: 'key-date'});
     const style = keyDate.color ? `fill: ${keyDate.color}` : '';
