@@ -18,13 +18,31 @@ function init() {
 }
 
 function addKeyDate() {
+  const domStartDate = el.datefrom.value;
   const cloned = document.importNode(el.keydatetemplate.content, true);
+  cloned.querySelector('[name=keydate').value = domStartDate;
   el.keydatelist.append(cloned);
+  const buttons = el.keydatelist.querySelectorAll('button.delete');
+  buttons[buttons.length-1].addEventListener('click', e => e.target.parentElement.remove());
+
+  // const sections = [...document.querySelectorAll('.keydate section')];
+  // debugger;
+  // for (const elInput of sections[sections.length-1]) {
+  //   elInput.addEventListener('change', redraw);
+  // }
+
+  redraw();
 }
 
 function addTask() {
   const cloned = document.importNode(el.tasktemplate.content, true);
   el.tasklist.append(cloned);
+  const buttons = el.tasklist.querySelectorAll('button.delete');
+  buttons[buttons.length-1].addEventListener('click', e => e.target.parentElement.remove());
+  //todo set start and end dates appropriately
+  const domStartDate = el.datefrom.valueAsDate;
+  const domEndDate = el.dateto.valueAsDate;
+  redraw();
 }
 
 function redraw() {
@@ -33,21 +51,55 @@ function redraw() {
 }
 
 function gatherInputData() {
-  const retval = {};
+  const retval = {
+    keyDates: [],
+    tasks: [],
+  };
 
   const dummyStart = new Date('2020-09-15');
   const dummyEnd = new Date('2021-05-07');
 
   retval.tasks = generateDummyTasks(dummyStart, dummyEnd);
+  const tasks = document.querySelectorAll('.task section');
+  for (const taskform of tasks) {
+    const task = {
+      name: getNameValue(taskform, 'name'),
+      start: new Date(getNameValue(taskform, 'from')),
+      end: new Date(getNameValue(taskform, 'to')),
+      bg: getNameValue(taskform, 'bg'),
+      color: getNameValue(taskform, 'fg'),
+      layer: getNameValue(taskform, 'layer'),
+    }
+    retval.tasks.push(task);
+  }
+
   retval.keyDates = generateDummyKeyDates(dummyStart, dummyEnd);
+  const dates = document.querySelectorAll('.keydate section');
+  for (const keydateform of dates) {
+    const keydate = {
+      name: getNameValue(keydateform, 'name'),
+      date: new Date(getNameValue(keydateform, 'keydate')),
+      color: new Date(getNameValue(keydateform, 'color')),
+    }
+    retval.keyDates.push(keydate);
+  }
+
+
+  function getNameValue(elem, thing) {
+    return elem.querySelector(`[name=${thing}`).value;
+  }
+
 
   // calculate start/end date from the key and task dates
   const keyDates = retval.keyDates.map(k => k.date);
   const taskStartDates = retval.tasks.map(t => t.start);
   const taskEndDates = retval.tasks.map(t => t.end);
 
-  retval.startDate = new Date(Math.min(...keyDates.concat(taskStartDates).map(d => Number(d))));
-  retval.endDate = new Date(Math.max(...keyDates.concat(taskEndDates).map(d => Number(d))));
+  const domStartDate = el.datefrom.valueAsDate;
+  const domEndDate = el.dateto.valueAsDate;
+
+  retval.startDate = new Date(Math.min(...keyDates.concat(taskStartDates, domStartDate).map(d => Number(d))));
+  retval.endDate = new Date(Math.max(...keyDates.concat(taskEndDates, domEndDate).map(d => Number(d))));
 
   console.log(keyDates.concat(taskStartDates));
 
@@ -113,23 +165,23 @@ function draw(data) {
     keyDateSvgElements.push(drawKeyDate(keyDate));
   }
 
-  // compute how far up and right the key dates go
-  // this works only as long as CSS doesn't scale the SVG element
-  const svgBCR = el.timeline.getBoundingClientRect();
-  let top = vertOffset;
-  let right = width;
-  for (const keyDateEl of keyDateSvgElements) {
-    const elBCR = keyDateEl.getBoundingClientRect();
-    const elTopDist = elBCR.top - svgBCR.top;
-    top = Math.min(top, elTopDist);
-    const elRightDist = svgBCR.right - elBCR.right;
-    right = Math.min(right, elRightDist);
-  }
+  // // compute how far up and right the key dates go
+  // // this works only as long as CSS doesn't scale the SVG element
+  // const svgBCR = el.timeline.getBoundingClientRect();
+  // let top = vertOffset;
+  // let right = width;
+  // for (const keyDateEl of keyDateSvgElements) {
+  //   const elBCR = keyDateEl.getBoundingClientRect();
+  //   const elTopDist = elBCR.top - svgBCR.top;
+  //   top = Math.min(top, elTopDist);
+  //   const elRightDist = svgBCR.right - elBCR.right;
+  //   right = Math.min(right, elRightDist);
+  // }
 
-  el.timeline.setAttribute('width', width - right + 2);
-  el.timeline.setAttribute('height', height - top + 2);
-  el.timeline.setAttribute('viewBox',
-    `${-barHeight - 2} ${-vertOffset + top - 2} ${width - right + 2} ${height - top + 2}`);
+  // el.timeline.setAttribute('width', width - right + 2);
+  // el.timeline.setAttribute('height', height - top + 2);
+  // el.timeline.setAttribute('viewBox',
+  //   `${-barHeight - 2} ${-vertOffset + top - 2} ${width - right + 2} ${height - top + 2}`);
 
 
   function drawTask(task) {

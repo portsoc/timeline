@@ -28,15 +28,15 @@
   <section>
     <h2>Timeline</h2>
     <label>
-      <input id="daywidth" type=range min=4 max=40 value=20></input>
+      <input id="daywidth" type=range min=4 max=40 value=10></input>
       Scale
     </label>
     <label>
-      <input id="datefrom" type="date" value="2021-09-01"></input>
+      <input id="datefrom" type="date" value="2020-09-01"></input>
       Start Date
     </label>
     <label>
-      <input id="dateto" type="date" value="2022-02-01"></input>
+      <input id="dateto" type="date" value="2021-02-01"></input>
       End Date
     </label>
   </section>
@@ -54,7 +54,6 @@
 
 
 <template id=tasktemplate>
-
   <div class=task>
     <button class="delete" type=text>❌</button>
     <section>
@@ -84,25 +83,26 @@
       </label>
     </section>
   </div>
-
-
 </template>
 
 
 
 <template id=keydatetemplate>
-  <section>
-    <label>
-      <input name="name" type="text" placeholder="Task name"></input>
-      Name
-    </label>
-    <label>
-      <input name="keydate" type="date" value="2021-09-01"></input>
-      Start Date
-    </label>
-    <label>
-      <input name="color" type="color" value="2022-02-01"></input>
-      Background
-    </label>
-  </section>
+  <div class=keydate>
+    <button class="delete" type=text>❌</button>
+    <section>
+      <label>
+        <input name="name" type="text" placeholder="Task name"></input>
+        Name
+      </label>
+      <label>
+        <input name="keydate" type="date" value="2020-09-01"></input>
+        Start Date
+      </label>
+      <label>
+        <input name="color" type="color" value="#6699AA"></input>
+        Background
+      </label>
+    </section>
+  </div>
 </template>

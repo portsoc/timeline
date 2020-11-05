@@ -126,8 +126,8 @@ heading h2 {
 
 .bigbutt  {
   transition: 0.1s;
-  width: 3rem;
-  min-height: 3rem;
+  width: 2rem;
+  height: 2rem;
   background: var(--blue);
   color: var(--bg);
   font-weight: bold;
@@ -147,11 +147,12 @@ heading h2 {
   outline: none;
 }
 
-.task {
+.task, .keydate {
   position: relative;
 }
 
-.task .delete {
+.task .delete,
+.keydate .delete {
   position: absolute;
   top: 0;
   right: 0;
@@ -161,11 +162,13 @@ heading h2 {
   filter: brightness(0%);
 }
 
-.task .delete:hover {
+.task .delete:hover,
+.keydate .delete:hover {
   filter: brightness(110%);
   transform: scale(1.1);
 }
 
-.task .delete:focus {
+.task .delete:focus,
+.keydate .delete:focus {
   outline: none;
 }
