@@ -26,20 +26,26 @@ function redraw() {
 function gatherInputData() {
   const retval = {};
 
-  const startDate = el.datefrom.valueAsDate;
-  const endDate = el.dateto.valueAsDate;
+  const dummyStart = new Date('2020-09-15');
+  const dummyEnd = new Date('2021-05-07');
 
-  retval.tasks = generateDummyTasks(startDate, endDate);
-  retval.keyDates = generateDummyKeyDates(startDate, endDate);
+  retval.tasks = generateDummyTasks(dummyStart, dummyEnd);
+  retval.keyDates = generateDummyKeyDates(dummyStart, dummyEnd);
 
-  retval.startDate = startDate;
-  retval.endDate = endDate;
+  // calculate start/end date from the key and task dates
+  const keyDates = retval.keyDates.map(k => k.date);
+  const taskStartDates = retval.tasks.map(t => t.start);
+  const taskEndDates = retval.tasks.map(t => t.end);
+
+  retval.startDate = new Date(Math.min(...keyDates.concat(taskStartDates).map(d => Number(d))));
+  retval.endDate = new Date(Math.max(...keyDates.concat(taskEndDates).map(d => Number(d))));
+
+  console.log(keyDates.concat(taskStartDates));
 
   return retval;
 }
 
 function draw(data) {
-  // todo calculate end and start date from data
   const firstDate = new Date(data.startDate.getFullYear(), data.startDate.getMonth(), 1);
   const lastDate = new Date(new Date(data.endDate.getFullYear(), data.endDate.getMonth() + 1, 1) - 24 * 60 * 60 * 1000);
 
