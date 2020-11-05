@@ -3,8 +3,6 @@
 
 const UNIT = 24;
 const DAY_MILLIS = 1000 * 60 * 60 * 24;
-const tasks = [];
-const keyDates = [];
 const el = {};
 
 const vertOffset = 300; // todo auto adjust this
@@ -17,18 +15,33 @@ function init() {
   el.dateto.addEventListener('change', redraw);
   el.daywidth.addEventListener('input', redraw);
 
-  addDummyTasks(el.datefrom.valueAsDate, el.dateto.valueAsDate);
-  addDummyKeyDates(el.datefrom.valueAsDate, el.dateto.valueAsDate);
-
   redraw();
 }
 
 function redraw() {
+  const timelineData = gatherInputData();
+  draw(timelineData);
+}
+
+function gatherInputData() {
+  const retval = {};
+
   const startDate = el.datefrom.valueAsDate;
   const endDate = el.dateto.valueAsDate;
 
-  const firstDate = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
-  const lastDate = new Date(new Date(endDate.getFullYear(), endDate.getMonth() + 1, 1) - 24 * 60 * 60 * 1000);
+  retval.tasks = generateDummyTasks(startDate, endDate);
+  retval.keyDates = generateDummyKeyDates(startDate, endDate);
+
+  retval.startDate = startDate;
+  retval.endDate = endDate;
+
+  return retval;
+}
+
+function draw(data) {
+  // todo calculate end and start date from data
+  const firstDate = new Date(data.startDate.getFullYear(), data.startDate.getMonth(), 1);
+  const lastDate = new Date(new Date(data.endDate.getFullYear(), data.endDate.getMonth() + 1, 1) - 24 * 60 * 60 * 1000);
 
   const dayWidth = el.daywidth.value / 4;
 
@@ -73,11 +86,11 @@ function redraw() {
     el.timeline.append(monthMarker);
   }
 
-  for (const task of tasks) {
+  for (const task of data.tasks) {
     drawTask(task);
   }
 
-  for (const keyDate of keyDates) {
+  for (const keyDate of data.keyDates) {
     drawKeyDate(keyDate);
   }
 
@@ -147,7 +160,8 @@ function svg(name, attributes = {}) {
 }
 
 
-function addDummyTasks(startDate, endDate) {
+function generateDummyTasks(startDate, endDate) {
+  const tasks = [];
   tasks.push({
     name: 'one',
     start: startDate,
@@ -180,9 +194,11 @@ function addDummyTasks(startDate, endDate) {
     color: '#0F0',
     layer: 3,
   });
+  return tasks;
 }
 
-function addDummyKeyDates(startDate, endDate) {
+function generateDummyKeyDates(startDate, endDate) {
+  const keyDates = [];
   keyDates.push({
     name: 'First',
     date: startDate,
@@ -200,4 +216,5 @@ function addDummyKeyDates(startDate, endDate) {
     name: 'Last Deadline',
     date: endDate,
   });
+  return keyDates;
 }
