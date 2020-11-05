@@ -1,11 +1,9 @@
 // get a handle on envery element in the
 // page for safe shorthand use
 
-const UNIT = 24;
+const UNIT = 16; // default font size
 const DAY_MILLIS = 1000 * 60 * 60 * 24;
 const el = {};
-
-const vertOffset = 300; // todo auto adjust this
 
 window.addEventListener('load', init);
 
@@ -58,47 +56,50 @@ function gatherInputData() {
 
 function draw(data) {
   const firstDate = new Date(data.startDate.getFullYear(), data.startDate.getMonth(), 1);
-  const lastDate = new Date(new Date(data.endDate.getFullYear(), data.endDate.getMonth() + 1, 1) - 24 * 60 * 60 * 1000);
 
   const dayWidth = el.daywidth.value / 4;
 
-  const days = (lastDate - firstDate) / 1000 / 24 / 60 / 60 * dayWidth;
-  const barHeight = UNIT * 2;
-  const halfBarHeight = UNIT;
-  const taskHeight = UNIT;
-  const offset = UNIT * 0.6;
-  const pad = UNIT * 0.1;
+  const days = (data.endDate - firstDate) / DAY_MILLIS * dayWidth;
+
+  const barHeight = UNIT * 2.5;
+  const halfBarHeight = barHeight / 2;
+  const taskHeight = UNIT * 1.4;
+  const taskStart = barHeight * 1.5;
+  const taskPad = UNIT * 0.2;
 
   document.documentElement.style.setProperty('--unit', UNIT + 'px');
 
-  const width = days + 20 * UNIT;
-  const height = 20 * UNIT;
+  const width = days + barHeight * 10;
+  const vertOffset = 300; // todo auto adjust this
+  const taskLayers = Math.max(...data.tasks.map(t => t.layer)) + 1;
+  const height = vertOffset + taskStart + taskHeight * taskLayers + 2;
+
 
   // create new SVG
   el.timeline.remove();
   el.timeline = svg('svg', {
     width,
-    height,
-    viewBox: `0 0 ${width} ${height}`,
+    height: height,
+    viewBox: `${-barHeight - 2} ${-vertOffset} ${width} ${height}`,
   });
   el.timelinecontainer.append(el.timeline);
 
   const barEl = svg('path', {
     id: 'bar',
-    d: `M0,${vertOffset} L${days},${vertOffset} L${days + halfBarHeight},${vertOffset + halfBarHeight} L${days},${vertOffset + barHeight} L0,${vertOffset + barHeight} z`,
+    d: `M${-barHeight},0 H${days + barHeight} L${days + barHeight + halfBarHeight},${halfBarHeight} L${days + barHeight},${barHeight} H${-barHeight} z`,
   });
   el.timeline.append(barEl);
 
   const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-
-  for (let monthStart = firstDate; monthStart < lastDate; monthStart = getNextMonthStart(monthStart)) {
+  for (let monthStart = firstDate; monthStart <= data.endDate; monthStart = getNextMonthStart(monthStart)) {
     const text = MONTHS[monthStart.getMonth()];
     const monthMarker = svg('text', {
-      transform: `translate(${dateX(monthStart) + offset},${vertOffset + barHeight - pad}) rotate(-45)`,
+      transform: `translate(${dateX(monthStart)},${barHeight / 2}) rotate(-45)`,
       class: 'month-marker',
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
     });
-    // todo reconsider 15 above so dates align with months somehow
     monthMarker.textContent = text;
     el.timeline.append(monthMarker);
   }
@@ -107,13 +108,32 @@ function draw(data) {
     drawTask(task);
   }
 
+  const keyDateSvgElements = [];
   for (const keyDate of data.keyDates) {
-    drawKeyDate(keyDate);
+    keyDateSvgElements.push(drawKeyDate(keyDate));
   }
+
+  // compute how far up and right the key dates go
+  // this works only as long as CSS doesn't scale the SVG element
+  const svgBCR = el.timeline.getBoundingClientRect();
+  let top = vertOffset;
+  let right = width;
+  for (const keyDateEl of keyDateSvgElements) {
+    const elBCR = keyDateEl.getBoundingClientRect();
+    const elTopDist = elBCR.top - svgBCR.top;
+    top = Math.min(top, elTopDist);
+    const elRightDist = svgBCR.right - elBCR.right;
+    right = Math.min(right, elRightDist);
+  }
+
+  el.timeline.setAttribute('width', width - right + 2);
+  el.timeline.setAttribute('height', height - top + 2);
+  el.timeline.setAttribute('viewBox',
+    `${-barHeight - 2} ${-vertOffset + top - 2} ${width - right + 2} ${height - top + 2}`);
 
 
   function drawTask(task) {
-    const y = task.layer * taskHeight + vertOffset + barHeight + halfBarHeight;
+    const y = taskStart + task.layer * taskHeight;
     const x = dateX(task.start);
     const width = dateX(task.end) - x;
     const g = svg('g', { class: 'task' });
@@ -126,29 +146,40 @@ function draw(data) {
       rx: 4,
       fill: task.bg,
     });
-    const textEl = svg('text', { x: x + pad, y: y + taskHeight / 2 + pad, style: `fill: ${task.color}` });
+    const textEl = svg('text', {
+      x: x + taskPad,
+      y: y + taskHeight / 2,
+      style: `fill: ${task.color}`,
+    });
     textEl.textContent = task.name;
     g.append(barEl, textEl);
     el.timeline.append(g);
   }
 
   function drawKeyDate(keyDate) {
-    const y = vertOffset;
+    const y = 0;
     const x1 = dateX(keyDate.date);
     const g = svg('g', { class: 'key-date' });
     const style = keyDate.color ? `fill: ${keyDate.color}` : '';
 
-    const dateEl = svg('text', { x: x1, y: y - taskHeight, style, class: 'date' });
+    const dateEl = svg('text', {
+      x: x1,
+      y: y - taskHeight,
+      style,
+      class: 'date',
+      'text-anchor': 'middle',
+    });
     dateEl.textContent = keyDate.date.getDate();
 
     const nameEl = svg('text', {
-      transform: `translate(${x1 + UNIT / 2},${y - taskHeight * 2}) rotate(-45)`,
+      transform: `translate(${x1},${y - taskHeight * 2}) rotate(-45)`,
       style,
     });
     nameEl.textContent = keyDate.name;
 
     g.append(dateEl, nameEl);
     el.timeline.append(g);
+    return g;
   }
 
   function dateX(date) {
@@ -158,7 +189,7 @@ function draw(data) {
 
 
 function dayDiff(date1, date2) {
-  return (date2 - date1) / 1000 / 24 / 60 / 60;
+  return (date2 - date1) / DAY_MILLIS;
 }
 
 function getNextMonthStart(date) {

@@ -2,3 +2,6 @@ extends: portsoc
 root: true
 env:
   browser: true
+
+rules:
+  quote-props: 0

@@ -34,11 +34,9 @@
 }
 
 body {
-  font-size: var(--unit);
-  font-family: var(--face);
   display: grid;
   grid-template: var(--grid);
-  overflow: hidden;
+  /* overflow: hidden; */
   color: var(--fg);
   background-color: var(--bg);
 }
@@ -75,7 +73,10 @@ body>h1 {
 }
 
 svg {
-  width: 100%;
+  /* setting the width should disable the automatic sizing bit in JS */
+  /* max-width: 100%; */
+  font-size: var(--unit);
+  font-family: var(--face);
 }
 
 
@@ -86,11 +87,11 @@ svg {
 .month-marker {
   fill: var(--barfg);
   font-weight: bold;
+  font-size: 110%;
 }
 
 .task>text {
-  font-size: 80%;
-  dominant-baseline: middle;
+  dominant-baseline: central;
 }
 
 .key-date {
