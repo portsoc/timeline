@@ -14,8 +14,19 @@ function init() {
   el.datefrom.addEventListener('change', redraw);
   el.dateto.addEventListener('change', redraw);
   el.daywidth.addEventListener('input', redraw);
-
+  el.addkeydate.addEventListener('click', addKeyDate);
+  el.addtask.addEventListener('click', addTask);
   redraw();
+}
+
+function addKeyDate() {
+  const cloned = document.importNode(el.keydatetemplate.content, true);
+  el.keydatelist.append(cloned);
+}
+
+function addTask() {
+  const cloned = document.importNode(el.tasktemplate.content, true);
+  el.tasklist.append(cloned);
 }
 
 function redraw() {

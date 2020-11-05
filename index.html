@@ -9,8 +9,28 @@
 <h1>Timeline Generator</h1>
 
 <main>
+  <section id=keydatelist>
+    <heading>
+      <h2>Key Dates</h2>
+      <button class=bigbutt id=addkeydate>✚</button>
+    </heading>
+    <p>No key dates added yet.</p>
+  </section>
+
+  <section id=tasklist>
+    <heading>
+      <h2>Tasks</h2>
+      <button class=bigbutt id=addtask>✚</button>
+    </heading>
+    <p>No tasks added yet.</p>
+  </section>
+
   <section>
     <h2>Timeline</h2>
+    <label>
+      <input id="daywidth" type=range min=4 max=40 value=20></input>
+      Scale
+    </label>
     <label>
       <input id="datefrom" type="date" value="2021-09-01"></input>
       Start Date
@@ -19,41 +39,6 @@
       <input id="dateto" type="date" value="2022-02-01"></input>
       End Date
     </label>
-    <label>
-      <input id="daywidth" type=range min=4 max=40 value=20></input>
-      Scale
-    </label>
-  </section>
-
-  <section>
-    <h2>Task</h2>
-    <label>
-      <input name="taskname" type="text" placeholder="Task name"></input>
-      Name
-    </label>
-    <label>
-      <input name="taskdatefrom" type="date" value="2021-09-01"></input>
-      Start Date
-    </label>
-    <label>
-      <input name="taskdateto" type="date" value="2022-02-01"></input>
-      End Date
-    </label>
-    <label>
-      <input name="taskbg" type="color" value="2022-02-01"></input>
-      Background
-    </label>
-    <label>
-      <input name="taskfg" type="color" value="2022-02-01"></input>
-      Foreground
-    </label>
-    <label>
-      <input name="tasklayer" type="number" value="1"></input>
-      Layer
-    </label>
-
-
-
   </section>
 
 </main>
@@ -65,3 +50,59 @@
     <text x="80" y="80">anywhere</text>
   </svg>
 </figure>
+
+
+
+<template id=tasktemplate>
+
+  <div class=task>
+    <button class="delete" type=text>❌</button>
+    <section>
+      <label>
+        <input name="name" type="text" placeholder="Task name"></input>
+        Name
+      </label>
+      <label>
+        <input name="from" type="date" value="2021-09-01"></input>
+        Start Date
+      </label>
+      <label>
+        <input name="to" type="date" value="2022-02-01"></input>
+        End Date
+      </label>
+      <label>
+        <input name="bg" type="color" value="2022-02-01"></input>
+        Background
+      </label>
+      <label>
+        <input name="fg" type="color" value="2022-02-01"></input>
+        Foreground
+      </label>
+      <label>
+        <input name="layer" type="number" value="1"></input>
+        Layer
+      </label>
+    </section>
+  </div>
+
+
+</template>
+
+
+
+<template id=keydatetemplate>
+  <section>
+    <label>
+      <input name="name" type="text" placeholder="Task name"></input>
+      Name
+    </label>
+    <label>
+      <input name="keydate" type="date" value="2021-09-01"></input>
+      Start Date
+    </label>
+    <label>
+      <input name="color" type="color" value="2022-02-01"></input>
+      Background
+    </label>
+  </section>
+</template>

@@ -101,11 +101,70 @@ svg {
   font-weight: bold;
 }
 
-
 section {
   margin-bottom: 0.5rem;
   padding: 0.5rem;
   background: var(--taskbg);
   border-radius: 0.25rem;
   border: grey thin solid;
+}
+
+heading {
+  display: flex;
+  flex: 1;
+}
+
+heading h2 {
+  flex-grow: 1;
+}
+
+
+#controls {
+  display: flex;
+}
+
+.bigbutt  {
+  transition: 0.1s;
+  width: 3rem;
+  min-height: 3rem;
+  background: var(--blue);
+  color: var(--bg);
+  font-weight: bold;
+  font-size: 100%;
+  border-radius: 100%;
+  border: none;
+  margin-right: 0.5rem;
+  box-shadow: 0 0.25rem 0.25rem rgba(0,0,0,0.5);
+}
+
+.bigbutt:hover {
+  filter: brightness(110%);
+  box-shadow: 0 0.25rem 0.25rem rgba(0,0,0,0.75);
+}
+
+.bigbutt:focus {
+  outline: none;
+}
+
+.task {
+  position: relative;
+}
+
+.task .delete {
+  position: absolute;
+  top: 0;
+  right: 0;
+  border: none;
+  background: none;
+  color: black;
+  filter: brightness(0%);
+}
+
+.task .delete:hover {
+  filter: brightness(110%);
+  transform: scale(1.1);
+}
+
+.task .delete:focus {
+  outline: none;
 }
