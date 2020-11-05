@@ -9,7 +9,6 @@ const el = {};
 
 let vert_offset = 300; // todo auto adjust this
 
-
 window.addEventListener('load', init);
 
 function init() {
@@ -17,17 +16,16 @@ function init() {
   el.datefrom.addEventListener("change", redraw);
   el.dateto.addEventListener("change", redraw);
   el.daywidth.addEventListener("input", redraw);
+
+  addDummyTasks(el.datefrom.valueAsDate, el.dateto.valueAsDate);
+  addDummyKeyDates(el.datefrom.valueAsDate, el.dateto.valueAsDate);
+
   redraw();
 }
 
 function redraw() {
-  el.timeline.textContent = ''; // remove all content
-
   const startDate = el.datefrom.valueAsDate;
   const endDate = el.dateto.valueAsDate;
-
-  addDummyTasks();
-  addDummyKeyDates();
 
   const firstDate = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
   const lastDate = new Date(new Date(endDate.getFullYear(), endDate.getMonth()+1, 1)-24*60*60*1000);
@@ -40,9 +38,21 @@ function redraw() {
   const taskHeight = UNIT;
   const offset = UNIT * 0.6;
   const pad = UNIT * 0.1;
-
+  
   document.documentElement.style.setProperty('--unit', UNIT + "px");
 
+  const width = days + 20 * UNIT;
+  const height = 20 * UNIT;
+
+  // create new SVG
+  el.timeline.remove();
+  el.timeline = svg('svg', {
+    width,
+    height,
+    viewBox: `0 0 ${width} ${height}`
+  });
+   el.timelinecontainer.append(el.timeline);
+  
   const barEl = svg('path', {
     id: 'bar',
     d: `M0,${vert_offset} L${days},${vert_offset} L${days+halfBarHeight},${vert_offset+halfBarHeight} L${days},${vert_offset+barHeight} L0,${vert_offset+barHeight} z`,
@@ -115,60 +125,6 @@ function redraw() {
     return dayDiff(firstDate, date)*dayWidth;
   }
 
-  function addDummyTasks() {
-    tasks.push({
-      name: 'one',
-      start: startDate,
-      end: new Date(Number(startDate) + 40 * DAY_MILLIS),
-      bg: '#336699',
-      color: '#FFF',
-      layer: 0,
-    });
-    tasks.push({
-      name: 'two',
-      start: new Date(Number(startDate) + 40 * DAY_MILLIS),
-      end: new Date(Number(startDate) + 80  * DAY_MILLIS),
-      bg: '#339966',
-      color: '#FFF',
-      layer: 1,
-    });
-    tasks.push({
-      name: 'three',
-      start: new Date(Number(startDate) + 80 * DAY_MILLIS),
-      end: endDate,
-      bg: '#993366',
-      color: '#FFF',
-      layer: 0,
-    });
-    tasks.push({
-      name: 'foo',
-      start: startDate,
-      end: new Date(Number(startDate) + (endDate - startDate)),
-      bg: '#330099',
-      color: '#0F0',
-      layer: 3,
-    });
-  }
-  
-  function addDummyKeyDates() {
-    keyDates.push({
-      name: 'First',
-      date: startDate,
-      color: 'red',
-    });
-    keyDates.push({
-      name: 'Something',
-      date: new Date(Number(startDate) + 40 * DAY_MILLIS),
-    });
-    keyDates.push({
-      name: 'Another Thing',
-      date: new Date(Number(startDate) + 80 * DAY_MILLIS),
-    });
-    keyDates.push({
-      name: 'Last Deadline',
-      date: endDate,
-    });
-  }
 
 }
 
@@ -191,4 +147,61 @@ function svg(name, attributes = {}, classes = '') {
     el.setAttribute(attr, attributes[attr]);
   }
   return el;
+}
+
+
+
+function addDummyTasks(startDate, endDate) {
+  tasks.push({
+    name: 'one',
+    start: startDate,
+    end: new Date(Number(startDate) + 40 * DAY_MILLIS),
+    bg: '#336699',
+    color: '#FFF',
+    layer: 0,
+  });
+  tasks.push({
+    name: 'two',
+    start: new Date(Number(startDate) + 40 * DAY_MILLIS),
+    end: new Date(Number(startDate) + 80  * DAY_MILLIS),
+    bg: '#339966',
+    color: '#FFF',
+    layer: 1,
+  });
+  tasks.push({
+    name: 'three',
+    start: new Date(Number(startDate) + 80 * DAY_MILLIS),
+    end: endDate,
+    bg: '#993366',
+    color: '#FFF',
+    layer: 0,
+  });
+  tasks.push({
+    name: 'foo',
+    start: startDate,
+    end: new Date(Number(startDate) + (endDate - startDate)),
+    bg: '#330099',
+    color: '#0F0',
+    layer: 3,
+  });
+}
+
+function addDummyKeyDates(startDate, endDate) {
+  keyDates.push({
+    name: 'First',
+    date: startDate,
+    color: 'red',
+  });
+  keyDates.push({
+    name: 'Something',
+    date: new Date(Number(startDate) + 40 * DAY_MILLIS),
+  });
+  keyDates.push({
+    name: 'Another Thing',
+    date: new Date(Number(startDate) + 80 * DAY_MILLIS),
+  });
+  keyDates.push({
+    name: 'Last Deadline',
+    date: endDate,
+  });
 }

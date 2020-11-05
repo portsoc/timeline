@@ -69,11 +69,15 @@ body>h1 {
   color: var(--bg);
 }
 
-svg {
+#timelinecontainer {
   grid-area: output;
   background: var(--bg);
+}
+
+svg {
   width: 100%;
 }
+
 
 #bar {
   fill: var(--barcolor);
