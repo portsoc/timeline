@@ -2,7 +2,7 @@
 // page for safe shorthand use
 
 const UNIT = 24;
-
+const DAY_MILLIS = 1000*60*60*24;
 const tasks = [];
 const el = {};
 
@@ -33,7 +33,7 @@ function redraw() {
   const days = (lastDate - firstDate) / 1000 / 24 / 60 / 60 * dayWidth;
   const barHeight = UNIT * 2;
   const halfBarHeight = UNIT ;
-  const taskHeight = UNIT * 1.5;
+  const taskHeight = UNIT;
   const offset = UNIT * 0.6;
   const pad = UNIT * 0.1;
 
@@ -60,17 +60,23 @@ function redraw() {
   }
 
   for (const task of tasks) {
-    const y = task.layer * barHeight + 100 + barHeight + halfBarHeight;
+    drawTask(task);
+  }
+
+  function drawTask(task) {
+    const y = task.layer * taskHeight + 100 + barHeight + halfBarHeight;
     const x1 = dateX(task.start);
     const x2 = dateX(task.end);
+    const g = svg('g', {class: 'task'});
     const barEl = svg('path', {
       class: 'task',
       d: `M${x1},${y} L${x2},${y} L${x2},${y+taskHeight} L${x1},${y+taskHeight} z`,
       fill: task.bg,
     });
-    const textEl = svg('text', {x: x1+pad, y: y+taskHeight - pad, style: `fill: ${task.color}`});
+    const textEl = svg('text', {x: x1+pad, y: y+taskHeight/2+pad, style: `fill: ${task.color}`});
     textEl.textContent = task.name; 
-    el.timeline.append(barEl, textEl);
+    g.append(barEl, textEl);
+    el.timeline.append(g);
   }
 
   function dateX(date) {
@@ -79,20 +85,36 @@ function redraw() {
 
   function addDummyTasks() {
     tasks.push({
-      name: 'foo',
+      name: 'one',
       start: startDate,
+      end: new Date(Number(startDate) + 40 * DAY_MILLIS),
+      bg: '#336699',
+      color: '#FFF',
+      layer: 0,
+    });
+    tasks.push({
+      name: 'two',
+      start: new Date(Number(startDate) + 40 * DAY_MILLIS),
+      end: new Date(Number(startDate) + 80  * DAY_MILLIS),
+      bg: '#339966',
+      color: '#FFF',
+      layer: 1,
+    });
+    tasks.push({
+      name: 'three',
+      start: new Date(Number(startDate) + 80 * DAY_MILLIS),
       end: endDate,
-      bg: '#009fff',
-      color: '#F00',
+      bg: '#993366',
+      color: '#FFF',
       layer: 0,
     });
     tasks.push({
       name: 'foo',
       start: startDate,
-      end: new Date(Number(startDate) + (endDate - startDate)/2),
-      bg: '#df7f00',
+      end: new Date(Number(startDate) + (endDate - startDate)),
+      bg: '#330099',
       color: '#0F0',
-      layer: 1,
+      layer: 3,
     });
   }
   

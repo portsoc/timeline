@@ -84,6 +84,11 @@ svg {
   font-weight: bold;
 }
 
+.task>text {
+  font-size: 80%;
+  dominant-baseline: middle;
+}
+
 section {
   margin-bottom: 0.5rem;
   padding: 0.5rem;
