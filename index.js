@@ -9,9 +9,9 @@ window.addEventListener('load', init);
 
 function init() {
   document.querySelectorAll('[id]').forEach(e => { el[e.id] = e; });
+  document.addEventListener('input', redraw);
   el.datefrom.addEventListener('change', redraw);
   el.dateto.addEventListener('change', redraw);
-  el.daywidth.addEventListener('input', redraw);
   el.addkeydate.addEventListener('click', addKeyDate);
   el.addtask.addEventListener('click', addTask);
   redraw();
@@ -120,6 +120,7 @@ function draw(data) {
   const taskPad = UNIT * 0.2;
 
   document.documentElement.style.setProperty('--unit', UNIT + 'px');
+  document.documentElement.style.setProperty('--basecolor', el.basecolor.value);
 
   const width = days + barHeight * 10;
   const vertOffset = 300; // todo auto adjust this

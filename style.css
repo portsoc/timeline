@@ -9,11 +9,11 @@
     / auto 1fr;
   --face: 'Helvetica Neue', 'sans serif';
 
-  --barcolor: var(--purple);
   --barfg: var(--bg);
   --taskbg: #61135f33;
   --unit: 24px;
-
+  --basecolor: var(--purple);
+  --barcolor: var(--basecolor);
 }
 
 @media all and (max-width: 60em) {
@@ -95,7 +95,7 @@ svg {
 }
 
 .key-date {
-  fill: var(--purple);
+  fill: var(--basecolor);
 }
 
 .key-date .date {
