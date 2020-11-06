@@ -6,7 +6,7 @@
   --grid:
     "title title" auto
     "control output" 1fr
-    / auto 1fr;
+    / 20em auto;
   --face: 'Helvetica Neue', 'sans serif';
 
   --barfg: var(--bg);
@@ -36,7 +36,6 @@
 body {
   display: grid;
   grid-template: var(--grid);
-  /* overflow: hidden; */
   color: var(--fg);
   background-color: var(--bg);
 }
@@ -50,10 +49,11 @@ main, section {
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
+  height: 100%;
 }
 
-main>label {
-  padding-top: 1rem;
+section label {
+  padding-bottom: 0.25rem;
 }
 
 input {
@@ -103,7 +103,7 @@ svg {
 }
 
 section {
-  margin-bottom: 0.5rem;
+  margin-top: 0.5rem;
   padding: 0.5rem;
   background: var(--taskbg);
   border-radius: 0.25rem;
@@ -115,7 +115,7 @@ heading {
   flex: 1;
 }
 
-heading h2 {
+heading h3 {
   flex-grow: 1;
 }
 
@@ -134,7 +134,6 @@ heading h2 {
   font-size: 100%;
   border-radius: 100%;
   border: none;
-  margin-right: 0.5rem;
   box-shadow: 0 0.25rem 0.25rem rgba(0,0,0,0.5);
 }
 

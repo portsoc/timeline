@@ -5,43 +5,82 @@ const UNIT = 16; // default font size
 const DAY_MILLIS = 1000 * 60 * 60 * 24;
 const el = {};
 
+const colours = [
+  '#C4014B', '#E17300', '#76BE2A', '#00B482', '#E5007E', '#00A0FF',
+  '#014BC4', '#7300E1', '#BE2A76', '#B48200', '#007EE5', '#A0FF00',
+  '#4BC401', '#00E173', '#2A76BE', '#8200B4', '#7EE500', '#FF00A0',
+];
+let colourIndex = 0;
+
 window.addEventListener('load', init);
+
+function findFirstLayerWithSpace() {
+  const tasks = el.tasklist.querySelectorAll('.task [name=layer]');
+  let highest = -1;
+  for (const task of tasks) {
+    highest = Math.max(highest, task.valueAsNumber);
+  }
+  return highest + 1;
+}
 
 function init() {
   document.querySelectorAll('[id]').forEach(e => { el[e.id] = e; });
   document.addEventListener('input', redraw);
-  el.datefrom.addEventListener('change', redraw);
-  el.dateto.addEventListener('change', redraw);
+  document.addEventListener('change', redraw);
   el.addkeydate.addEventListener('click', addKeyDate);
   el.addtask.addEventListener('click', addTask);
   redraw();
 }
 
-function addKeyDate() {
-  const domStartDate = el.datefrom.value;
-  const cloned = document.importNode(el.keydatetemplate.content, true);
-  cloned.querySelector('[name=keydate').value = domStartDate;
-  el.keydatelist.append(cloned);
-  const buttons = el.keydatelist.querySelectorAll('button.delete');
-  buttons[buttons.length-1].addEventListener('click', e => e.target.parentElement.remove());
+function kill(e) {
+  e.target.parentElement.remove();
+  redraw();
+}
 
-  // const sections = [...document.querySelectorAll('.keydate section')];
-  // debugger;
-  // for (const elInput of sections[sections.length-1]) {
-  //   elInput.addEventListener('change', redraw);
-  // }
+function addKeyDate() {
+  const cloned = document.importNode(el.keydatetemplate.content, true);
+
+  const dates = el.keydatelist.querySelectorAll('[name=keydate]');
+  let lastDate = Math.max(0, ...[...dates].map(d => {
+    let res = new Date(d.value).getTime();
+    console.log({res});
+    return res;
+  }));
+
+  if (lastDate === 0) {
+    cloned.querySelector('[name=keydate]').value = el.datefrom.value;
+  } else {
+    console.log(lastDate, DAY_MILLIS);
+    const oldVal = new Date(lastDate);
+    const newVal = new Date(lastDate + DAY_MILLIS);
+    console.log({ oldVal, newVal });
+    cloned.querySelector('[name=keydate]').value = 0;
+  }
+
+  cloned.querySelector('[name=keydate]').value = el.datefrom.value;
+
+  el.keydatelist.append(cloned);
+
+  const buttons = el.keydatelist.querySelectorAll('button.delete');
+  buttons[buttons.length - 1].addEventListener('click', kill);
 
   redraw();
 }
 
 function addTask() {
   const cloned = document.importNode(el.tasktemplate.content, true);
+
+  colourIndex = ((colourIndex + 1) % colours.length);
+  cloned.querySelector('[name=bg]').value = colours[colourIndex];
+  cloned.querySelector('[name=from]').value = el.datefrom.value;
+  cloned.querySelector('[name=to]').value = el.dateto.value;
+  cloned.querySelector('[name=layer]').value = findFirstLayerWithSpace();
+
   el.tasklist.append(cloned);
+
   const buttons = el.tasklist.querySelectorAll('button.delete');
-  buttons[buttons.length-1].addEventListener('click', e => e.target.parentElement.remove());
-  //todo set start and end dates appropriately
-  const domStartDate = el.datefrom.valueAsDate;
-  const domEndDate = el.dateto.valueAsDate;
+  buttons[buttons.length - 1].addEventListener('click', kill);
+
   redraw();
 }
 
@@ -56,10 +95,7 @@ function gatherInputData() {
     tasks: [],
   };
 
-  const dummyStart = new Date('2020-09-15');
-  const dummyEnd = new Date('2021-05-07');
-
-  retval.tasks = generateDummyTasks(dummyStart, dummyEnd);
+  //  retval.tasks = generateDummyTasks(dummyStart, dummyEnd);
   const tasks = document.querySelectorAll('.task section');
   for (const taskform of tasks) {
     const task = {
@@ -69,18 +105,18 @@ function gatherInputData() {
       bg: getNameValue(taskform, 'bg'),
       color: getNameValue(taskform, 'fg'),
       layer: getNameValue(taskform, 'layer'),
-    }
+    };
     retval.tasks.push(task);
   }
 
-  retval.keyDates = generateDummyKeyDates(dummyStart, dummyEnd);
+  // retval.keyDates = generateDummyKeyDates(dummyStart, dummyEnd);
   const dates = document.querySelectorAll('.keydate section');
   for (const keydateform of dates) {
     const keydate = {
       name: getNameValue(keydateform, 'name'),
       date: new Date(getNameValue(keydateform, 'keydate')),
       color: new Date(getNameValue(keydateform, 'color')),
-    }
+    };
     retval.keyDates.push(keydate);
   }
 
@@ -100,8 +136,6 @@ function gatherInputData() {
 
   retval.startDate = new Date(Math.min(...keyDates.concat(taskStartDates, domStartDate).map(d => Number(d))));
   retval.endDate = new Date(Math.max(...keyDates.concat(taskEndDates, domEndDate).map(d => Number(d))));
-
-  console.log(keyDates.concat(taskStartDates));
 
   return retval;
 }
@@ -124,7 +158,7 @@ function draw(data) {
 
   const width = days + barHeight * 10;
   const vertOffset = 300; // todo auto adjust this
-  const taskLayers = Math.max(...data.tasks.map(t => t.layer)) + 1;
+  const taskLayers = Math.max(0, ...data.tasks.map(t => t.layer)) + 1;
   const height = vertOffset + taskStart + taskHeight * taskLayers + 2;
 
 
@@ -260,62 +294,61 @@ function svg(name, attributes = {}) {
   return el;
 }
 
+// function generateDummyTasks(startDate = new Date('2020-09-15'), endDate = new Date('2021-05-07')) {
+//   const tasks = [];
+//   tasks.push({
+//     name: 'one',
+//     start: startDate,
+//     end: new Date(Number(startDate) + 40 * DAY_MILLIS),
+//     bg: '#336699',
+//     color: '#FFF',
+//     layer: 0,
+//   });
+//   tasks.push({
+//     name: 'two',
+//     start: new Date(Number(startDate) + 40 * DAY_MILLIS),
+//     end: new Date(Number(startDate) + 80 * DAY_MILLIS),
+//     bg: '#339966',
+//     color: '#FFF',
+//     layer: 1,
+//   });
+//   tasks.push({
+//     name: 'three',
+//     start: new Date(Number(startDate) + 80 * DAY_MILLIS),
+//     end: endDate,
+//     bg: '#993366',
+//     color: '#FFF',
+//     layer: 0,
+//   });
+//   tasks.push({
+//     name: 'foo',
+//     start: startDate,
+//     end: new Date(Number(startDate) + (endDate - startDate)),
+//     bg: '#330099',
+//     color: '#0F0',
+//     layer: 3,
+//   });
+//   return tasks;
+// }
 
-function generateDummyTasks(startDate, endDate) {
-  const tasks = [];
-  tasks.push({
-    name: 'one',
-    start: startDate,
-    end: new Date(Number(startDate) + 40 * DAY_MILLIS),
-    bg: '#336699',
-    color: '#FFF',
-    layer: 0,
-  });
-  tasks.push({
-    name: 'two',
-    start: new Date(Number(startDate) + 40 * DAY_MILLIS),
-    end: new Date(Number(startDate) + 80 * DAY_MILLIS),
-    bg: '#339966',
-    color: '#FFF',
-    layer: 1,
-  });
-  tasks.push({
-    name: 'three',
-    start: new Date(Number(startDate) + 80 * DAY_MILLIS),
-    end: endDate,
-    bg: '#993366',
-    color: '#FFF',
-    layer: 0,
-  });
-  tasks.push({
-    name: 'foo',
-    start: startDate,
-    end: new Date(Number(startDate) + (endDate - startDate)),
-    bg: '#330099',
-    color: '#0F0',
-    layer: 3,
-  });
-  return tasks;
-}
-
-function generateDummyKeyDates(startDate, endDate) {
-  const keyDates = [];
-  keyDates.push({
-    name: 'First',
-    date: startDate,
-    color: 'red',
-  });
-  keyDates.push({
-    name: 'Something',
-    date: new Date(Number(startDate) + 40 * DAY_MILLIS),
-  });
-  keyDates.push({
-    name: 'Another Thing',
-    date: new Date(Number(startDate) + 80 * DAY_MILLIS),
-  });
-  keyDates.push({
-    name: 'Last Deadline',
-    date: endDate,
-  });
-  return keyDates;
-}
+// function generateDummyKeyDates(startDate = new Date('2020-09-15'), endDate = new Date('2021-05-07')) {
+//   const keyDates = [];
+//   keyDates.push({
+//     name: 'First',
+//     date: startDate,
+//     color: 'red',
+//   });
+//   keyDates.push({
+//     name: 'Something',
+//     date: new Date(Number(startDate) + 40 * DAY_MILLIS),
+//   });
+//   keyDates.push({
+//     name: 'Another Thing',
+//     date: new Date(Number(startDate) + 80 * DAY_MILLIS),
+//   });
+//   keyDates.push({
+//     name: 'Last Deadline',
+//     date: endDate,
+//   });
+//   return keyDates;
+// }

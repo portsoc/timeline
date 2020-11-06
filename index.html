@@ -9,28 +9,8 @@
 <h1>Timeline Generator</h1>
 
 <main>
-  <section id=keydatelist>
-    <heading>
-      <h2>Key Dates</h2>
-      <button class=bigbutt id=addkeydate>✚</button>
-    </heading>
-    <p>No key dates added yet.</p>
-  </section>
-
-  <section id=tasklist>
-    <heading>
-      <h2>Tasks</h2>
-      <button class=bigbutt id=addtask>✚</button>
-    </heading>
-    <p>No tasks added yet.</p>
-  </section>
-
   <section>
     <h2>Timeline</h2>
-    <label>
-      <input id="daywidth" type=range min=4 max=40 value=10></input>
-      Scale
-    </label>
     <label>
       <input id="datefrom" type="date" value="2020-09-01"></input>
       Start Date
@@ -40,10 +20,27 @@
       End Date
     </label>
     <label>
+      <input id="daywidth" type=range min=4 max=40 value=10></input>
+      Scale
+    </label>
+    <label>
       <input id="basecolor" type="color" value="#61135f"></input>
       Base Color
     </label>
-</section>
+    <section id=keydatelist>
+      <heading>
+        <h3>Key Dates</h3>
+        <button class=bigbutt id=addkeydate>✚</button>
+      </heading>
+    </section>
+
+    <section id=tasklist>
+      <heading>
+        <h3>Tasks</h3>
+        <button class=bigbutt id=addtask>✚</button>
+      </heading>
+    </section>
+  </section>
 
 </main>
 
@@ -62,7 +59,7 @@
     <button class="delete" type=text>❌</button>
     <section>
       <label>
-        <input name="name" type="text" placeholder="Task name"></input>
+        <input name="name" type="text" placeholder="Task name" value="New Task"></input>
         Name
       </label>
       <label>
@@ -74,11 +71,11 @@
         End Date
       </label>
       <label>
-        <input name="bg" type="color" value="2022-02-01"></input>
+        <input name="bg" type="color" value="#336699"></input>
         Background
       </label>
       <label>
-        <input name="fg" type="color" value="2022-02-01"></input>
+        <input name="fg" type="color" value="#FFFFFF"></input>
         Foreground
       </label>
       <label>
@@ -96,7 +93,7 @@
     <button class="delete" type=text>❌</button>
     <section>
       <label>
-        <input name="name" type="text" placeholder="Task name"></input>
+        <input name="name" type="text" value="Something..."></input>
         Name
       </label>
       <label>
