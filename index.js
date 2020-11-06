@@ -40,24 +40,13 @@ function kill(e) {
 function addKeyDate() {
   const cloned = document.importNode(el.keydatetemplate.content, true);
 
-  const dates = el.keydatelist.querySelectorAll('[name=keydate]');
-  let lastDate = Math.max(0, ...[...dates].map(d => {
-    let res = new Date(d.value).getTime();
-    console.log({res});
-    return res;
-  }));
-
-  if (lastDate === 0) {
+  const dateFields = Array.from(el.keydatelist.querySelectorAll('[name=keydate]'));
+  const lastDate = Math.max(...dateFields.map(el => Number(el.valueAsDate)));
+  if (lastDate === -Infinity) {
     cloned.querySelector('[name=keydate]').value = el.datefrom.value;
   } else {
-    console.log(lastDate, DAY_MILLIS);
-    const oldVal = new Date(lastDate);
-    const newVal = new Date(lastDate + DAY_MILLIS);
-    console.log({ oldVal, newVal });
-    cloned.querySelector('[name=keydate]').value = 0;
+    cloned.querySelector('[name=keydate]').valueAsDate = new Date(lastDate + 28 * DAY_MILLIS);
   }
-
-  cloned.querySelector('[name=keydate]').value = el.datefrom.value;
 
   el.keydatelist.append(cloned);
 
@@ -115,8 +104,9 @@ function gatherInputData() {
     const keydate = {
       name: getNameValue(keydateform, 'name'),
       date: new Date(getNameValue(keydateform, 'keydate')),
-      color: new Date(getNameValue(keydateform, 'color')),
+      color: getNameValue(keydateform, 'color'),
     };
+    console.log(keydate.color);
     retval.keyDates.push(keydate);
   }
 

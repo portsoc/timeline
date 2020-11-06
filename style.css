@@ -148,6 +148,13 @@ heading h3 {
 
 .task, .keydate {
   position: relative;
+  margin: 0.5em 0 0 0;
+  padding: 0;
+}
+
+.task > section,
+.keydate > section {
+  margin: 0;
 }
 
 .task .delete,
