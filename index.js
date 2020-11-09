@@ -75,7 +75,9 @@ function addTask() {
 
 function redraw() {
   const timelineData = gatherInputData();
-  draw(timelineData);
+  el.timeline.remove();
+  el.timeline = draw(timelineData);
+  el.timelinecontainer.append(el.timeline);
 }
 
 function gatherInputData() {
@@ -127,15 +129,16 @@ function gatherInputData() {
   retval.startDate = new Date(Math.min(...keyDates.concat(taskStartDates, domStartDate).map(d => Number(d))));
   retval.endDate = new Date(Math.max(...keyDates.concat(taskEndDates, domEndDate).map(d => Number(d))));
 
+  retval.dayWidth = el.daywidth.value / 4;
+  retval.baseColor = el.basecolor.value;
+
   return retval;
 }
 
 function draw(data) {
   const firstDate = new Date(data.startDate.getFullYear(), data.startDate.getMonth(), 1);
 
-  const dayWidth = el.daywidth.value / 4;
-
-  const days = (data.endDate - firstDate) / DAY_MILLIS * dayWidth;
+  const days = (data.endDate - firstDate) / DAY_MILLIS * data.dayWidth;
 
   const barHeight = UNIT * 2.5;
   const halfBarHeight = barHeight / 2;
@@ -144,7 +147,7 @@ function draw(data) {
   const taskPad = UNIT * 0.2;
 
   document.documentElement.style.setProperty('--unit', UNIT + 'px');
-  document.documentElement.style.setProperty('--basecolor', el.basecolor.value);
+  document.documentElement.style.setProperty('--basecolor', data.baseColor);
 
   const width = days + barHeight * 10;
   const vertOffset = 300; // todo auto adjust this
@@ -153,19 +156,17 @@ function draw(data) {
 
 
   // create new SVG
-  el.timeline.remove();
-  el.timeline = svg('svg', {
+  const drawing = svg('svg', {
     width,
     height: height,
     viewBox: `${-barHeight - 2} ${-vertOffset} ${width} ${height}`,
   });
-  el.timelinecontainer.append(el.timeline);
 
   const barEl = svg('path', {
     id: 'bar',
     d: `M${-barHeight},0 H${days + barHeight} L${days + barHeight + halfBarHeight},${halfBarHeight} L${days + barHeight},${barHeight} H${-barHeight} z`,
   });
-  el.timeline.append(barEl);
+  drawing.append(barEl);
 
   const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -178,7 +179,7 @@ function draw(data) {
       'dominant-baseline': 'central',
     });
     monthMarker.textContent = text;
-    el.timeline.append(monthMarker);
+    drawing.append(monthMarker);
   }
 
   for (const task of data.tasks) {
@@ -190,9 +191,11 @@ function draw(data) {
     keyDateSvgElements.push(drawKeyDate(keyDate));
   }
 
+  return drawing;
+
   // // compute how far up and right the key dates go
   // // this works only as long as CSS doesn't scale the SVG element
-  // const svgBCR = el.timeline.getBoundingClientRect();
+  // const svgBCR = drawing.getBoundingClientRect();
   // let top = vertOffset;
   // let right = width;
   // for (const keyDateEl of keyDateSvgElements) {
@@ -203,9 +206,9 @@ function draw(data) {
   //   right = Math.min(right, elRightDist);
   // }
 
-  // el.timeline.setAttribute('width', width - right + 2);
-  // el.timeline.setAttribute('height', height - top + 2);
-  // el.timeline.setAttribute('viewBox',
+  // drawing.setAttribute('width', width - right + 2);
+  // drawing.setAttribute('height', height - top + 2);
+  // drawing.setAttribute('viewBox',
   //   `${-barHeight - 2} ${-vertOffset + top - 2} ${width - right + 2} ${height - top + 2}`);
 
 
@@ -230,7 +233,7 @@ function draw(data) {
     });
     textEl.textContent = task.name;
     g.append(barEl, textEl);
-    el.timeline.append(g);
+    drawing.append(g);
   }
 
   function drawKeyDate(keyDate) {
@@ -255,12 +258,12 @@ function draw(data) {
     nameEl.textContent = keyDate.name;
 
     g.append(dateEl, nameEl);
-    el.timeline.append(g);
+    drawing.append(g);
     return g;
   }
 
   function dateX(date) {
-    return dayDiff(firstDate, date) * dayWidth;
+    return dayDiff(firstDate, date) * data.dayWidth;
   }
 }
 
