@@ -19,15 +19,15 @@
     </label>
     <label>
       <input id="datefrom" type="date" value="2020-09-01"></input>
-      Start Date
+      From
     </label>
     <label>
       <input id="dateto" type="date" value="2021-02-01"></input>
-      End Date
+      To
     </label>
     <label>
       <input id="basecolor" type="color" value="#61135f"></input>
-      Fill Color
+      Fill
     </label>
     <label></label>
     <label>
@@ -36,13 +36,10 @@
     </label>
   </section>
 
-  <section id=keydatelist>
-    <h3>Key Date</h3>
-  </section>
-
-  <section id=tasklist>
-    <h3>Task</h3>
-  </section>
+  <div>
+    <div id=keydatelist></div>
+    <div id=tasklist></div>
+  </div>
 
 </main>
 
@@ -64,25 +61,26 @@
 
 <template id=tasktemplate>
   <section>
+    <h2>Task</h2>
     <label>
       <input name="name" type="text" placeholder="Task name" value="New Task"></input>
       Name
     </label>
     <label>
       <input name="from" type="date" value="2021-09-01"></input>
-      Start Date
+      From
     </label>
     <label>
       <input name="to" type="date" value="2022-02-01"></input>
-      End Date
+      To
     </label>
     <label>
       <input name="bg" type="color" value="#336699"></input>
-      Fill Colour
+      Fill
     </label>
     <label>
       <input name="fg" type="color" value="#FFFFFF"></input>
-      Text Colour
+      Text
     </label>
     <label>
       <input name="layer" type="number" value="1"></input>
@@ -98,19 +96,20 @@
 
 <template id=keydatetemplate>
   <section>
+    <h2>Key Date</h2>
     <label>
       <input name="name" type="text" value="Something..."></input>
       Name
     </label>
     <label>
       <input name="keydate" type="date" value="2020-09-01"></input>
-      Start Date
+      Start
     </label>
     <label></label>
     <label></label>
     <label>
       <input name="color" type="color" value="#61135f"></input>
-      Text Colour
+      Text
     </label>
     <label></label>
     <label>

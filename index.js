@@ -12,16 +12,17 @@ const colours = [
   '#4BC401', '#00E173', '#2A76BE', '#8200B4', '#7EE500', '#FF00A0',
 ];
 let colourIndex = 0;
+let uid = 0;
 
 window.addEventListener('load', init);
 
 function findFirstLayerWithSpace() {
-  const tasks = el.tasklist.querySelectorAll('.task [name=layer]');
+  const tasks = el.tasklist.querySelectorAll('[name=layer]');
   let highest = -1;
   for (const task of tasks) {
     highest = Math.max(highest, task.valueAsNumber);
   }
-  return highest + 1;
+  return (highest + 1) % 12;
 }
 
 function init() {
@@ -34,7 +35,7 @@ function init() {
 }
 
 function kill(e) {
-  e.target.parentElement.remove();
+  e.target.parentElement.parentElement.remove();
   redraw();
 }
 
@@ -82,15 +83,15 @@ function redraw() {
   el.timelinecontainer.append(el.timeline);
 }
 
-const retval = {
-  keyDates: [],
-  tasks: [],
-};
-
 function gatherInputData() {
 
+  const retval = {
+    keyDates: [],
+    tasks: [],
+  };
+
   //  retval.tasks = generateDummyTasks(dummyStart, dummyEnd);
-  const tasks = document.querySelectorAll('.task section');
+  const tasks = document.querySelectorAll('#tasklist section');
   for (const taskform of tasks) {
     const task = {
       name: getNameValue(taskform, 'name'),
@@ -104,7 +105,7 @@ function gatherInputData() {
   }
 
   // retval.keyDates = generateDummyKeyDates(dummyStart, dummyEnd);
-  const dates = document.querySelectorAll('.keydate section');
+  const dates = document.querySelectorAll('#keydatelist section');
   for (const keydateform of dates) {
     const keydate = {
       name: getNameValue(keydateform, 'name'),
@@ -195,25 +196,31 @@ function draw(data) {
     keyDateSvgElements.push(drawKeyDate(keyDate));
   }
 
+  computeBR(drawing);
+
   return drawing;
 
-  // // compute how far up and right the key dates go
-  // // this works only as long as CSS doesn't scale the SVG element
-  // const svgBCR = drawing.getBoundingClientRect();
-  // let top = vertOffset;
-  // let right = width;
-  // for (const keyDateEl of keyDateSvgElements) {
-  //   const elBCR = keyDateEl.getBoundingClientRect();
-  //   const elTopDist = elBCR.top - svgBCR.top;
-  //   top = Math.min(top, elTopDist);
-  //   const elRightDist = svgBCR.right - elBCR.right;
-  //   right = Math.min(right, elRightDist);
-  // }
 
-  // drawing.setAttribute('width', width - right + 2);
-  // drawing.setAttribute('height', height - top + 2);
-  // drawing.setAttribute('viewBox',
-  //   `${-barHeight - 2} ${-vertOffset + top - 2} ${width - right + 2} ${height - top + 2}`);
+  // compute how far up and right the key dates go
+  // this works only as long as CSS doesn't scale the SVG element
+  function computeBR(drawing) {
+    const svgBCR = drawing.getBoundingClientRect();
+    let top = vertOffset;
+    let right = width;
+    if (keyDateSvgElements.length > 0) {
+      for (const keyDateEl of keyDateSvgElements) {
+        const elBCR = keyDateEl.getBoundingClientRect();
+        const elTopDist = elBCR.top - svgBCR.top;
+        top = Math.min(top, elTopDist);
+        const elRightDist = svgBCR.right - elBCR.right;
+        right = Math.min(right, elRightDist);
+      }
+      drawing.setAttribute('width', width - right + 2);
+      drawing.setAttribute('height', height - top + 2);
+      drawing.setAttribute('viewBox',
+        `${-barHeight - 2} ${-vertOffset + top - 2} ${width - right + 2} ${height - top + 2}`);
+    }
+  }
 
 
   function drawTask(task) {
@@ -322,61 +329,10 @@ async function updateDownloadLink(svgElement) {
 }
 
 
-// function generateDummyTasks(startDate = new Date('2020-09-15'), endDate = new Date('2021-05-07')) {
-//   const tasks = [];
-//   tasks.push({
-//     name: 'one',
-//     start: startDate,
-//     end: new Date(Number(startDate) + 40 * DAY_MILLIS),
-//     bg: '#336699',
-//     color: '#FFF',
-//     layer: 0,
-//   });
-//   tasks.push({
-//     name: 'two',
-//     start: new Date(Number(startDate) + 40 * DAY_MILLIS),
-//     end: new Date(Number(startDate) + 80 * DAY_MILLIS),
-//     bg: '#339966',
-//     color: '#FFF',
-//     layer: 1,
-//   });
-//   tasks.push({
-//     name: 'three',
-//     start: new Date(Number(startDate) + 80 * DAY_MILLIS),
-//     end: endDate,
-//     bg: '#993366',
-//     color: '#FFF',
-//     layer: 0,
-//   });
-//   tasks.push({
-//     name: 'foo',
-//     start: startDate,
-//     end: new Date(Number(startDate) + (endDate - startDate)),
-//     bg: '#330099',
-//     color: '#0F0',
-//     layer: 3,
-//   });
-//   return tasks;
-// }
 
-// function generateDummyKeyDates(startDate = new Date('2020-09-15'), endDate = new Date('2021-05-07')) {
-//   const keyDates = [];
-//   keyDates.push({
-//     name: 'First',
-//     date: startDate,
-//     color: 'red',
-//   });
-//   keyDates.push({
-//     name: 'Something',
-//     date: new Date(Number(startDate) + 40 * DAY_MILLIS),
-//   });
-//   keyDates.push({
-//     name: 'Another Thing',
-//     date: new Date(Number(startDate) + 80 * DAY_MILLIS),
-//   });
-//   keyDates.push({
-//     name: 'Last Deadline',
-//     date: endDate,
-//   });
-//   return keyDates;
+// todo - use if we want to do clickable image elements
+// function getUnique() {
+//   const allowed = 'abcdefghijklmnopqrstuvwxyz';
+//   const replacer = c => c & allowed[Math.floor(Math.random() * allowed.length)];
+//   return 'xxx-xxx-xxx'.replace(/[x]/g, replacer);
 // }
