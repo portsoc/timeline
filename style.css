@@ -11,7 +11,7 @@
 
   --barfg: var(--bg);
   --taskbg: #61135f33;
-  --unit: 24px;
+  --unit: 16px;
   --basecolor: var(--purple);
   --barcolor: var(--basecolor);
 }
@@ -61,10 +61,15 @@ input {
   width: 10em;
 }
 
-body>h1 {
+body>header {
   grid-area: title;
   background-color: var(--purple);
   color: var(--bg);
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 100vw;
 }
 
 #timelinecontainer {
@@ -177,4 +182,13 @@ button.big:focus {
 .task .delete:focus,
 .keydate .delete:focus {
   outline: none;
+}
+
+#downloadsvg {
+  border: grey thin solid;
+  background-color: var(--bg);
+  color: var(--fg);
+  display: block;
+  padding: 0.25em;
+  border-radius: 0.25em;
 }

@@ -3,6 +3,7 @@
 
 const UNIT = 16; // default font size
 const DAY_MILLIS = 1000 * 60 * 60 * 24;
+const SVG_NS = 'http://www.w3.org/2000/svg';
 const el = {};
 
 const colours = [
@@ -77,6 +78,7 @@ function redraw() {
   const timelineData = gatherInputData();
   el.timeline.remove();
   el.timeline = draw(timelineData);
+  updateDownloadLink(el.timeline);
   el.timelinecontainer.append(el.timeline);
 }
 
@@ -160,6 +162,7 @@ function draw(data) {
     width,
     height: height,
     viewBox: `${-barHeight - 2} ${-vertOffset} ${width} ${height}`,
+    xmlns: SVG_NS,
   });
 
   const barEl = svg('path', {
@@ -280,12 +283,43 @@ function getNextMonthStart(date) {
   * create an SVG DOM element
   */
 function svg(name, attributes = {}) {
-  const el = document.createElementNS('http://www.w3.org/2000/svg', name);
+  const el = document.createElementNS(SVG_NS, name);
   for (const attr of Object.keys(attributes)) {
     el.setAttribute(attr, attributes[attr]);
   }
   return el;
 }
+
+let css;
+
+async function updateDownloadLink(svgElement) {
+  try {
+    // load CSS if we haven't already
+    if (css == null) {
+      const response = await fetch('style.css');
+      if (response.ok) css = await response.text();
+    }
+
+    // add styling
+    const clone = document.importNode(svgElement, true);
+    const style = svg('style');
+    style.textContent = css;
+    clone.append(style);
+
+    // now update the download URL
+    const svgContent = clone.outerHTML;
+    const encodedUri = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgContent);
+    el.downloadsvg.href = encodedUri;
+  } catch (e) {
+    // could not get CSS (or some other problem)
+    console.error(e);
+    delete el.downloadsvg.href;
+    el.downloadsvg.textContent = 'cannot download SVG';
+    el.downloadsvg.title = 'cannot download SVG because CSS cannot be fetched';
+    css = false;
+  }
+}
+
 
 // function generateDummyTasks(startDate = new Date('2020-09-15'), endDate = new Date('2021-05-07')) {
 //   const tasks = [];
