@@ -12,7 +12,6 @@ const colours = [
   '#4BC401', '#00E173', '#2A76BE', '#8200B4', '#7EE500', '#FF00A0',
 ];
 let colourIndex = 0;
-let uid = 0;
 
 window.addEventListener('load', init);
 
@@ -84,7 +83,6 @@ function redraw() {
 }
 
 function gatherInputData() {
-
   const retval = {
     keyDates: [],
     tasks: [],
@@ -327,8 +325,6 @@ async function updateDownloadLink(svgElement) {
     css = false;
   }
 }
-
-
 
 // todo - use if we want to do clickable image elements
 // function getUnique() {
