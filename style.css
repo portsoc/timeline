@@ -124,7 +124,7 @@ heading h3 {
   display: flex;
 }
 
-.bigbutt  {
+button.big  {
   transition: 0.1s;
   width: 2rem;
   height: 2rem;
@@ -137,12 +137,12 @@ heading h3 {
   box-shadow: 0 0.25rem 0.25rem rgba(0,0,0,0.5);
 }
 
-.bigbutt:hover {
+button.big:hover {
   filter: brightness(110%);
   box-shadow: 0 0.25rem 0.25rem rgba(0,0,0,0.75);
 }
 
-.bigbutt:focus {
+button.big:focus {
   outline: none;
 }
 
