@@ -16,6 +16,8 @@
   <section>
     <h2>Timeline</h2>
     <label>
+    </label>
+    <label>
       <input id="datefrom" type="date" value="2020-09-01"></input>
       Start Date
     </label>
@@ -24,29 +26,31 @@
       End Date
     </label>
     <label>
+      <input id="basecolor" type="color" value="#61135f"></input>
+      Fill Color
+    </label>
+    <label></label>
+    <label>
       <input id="daywidth" type=range min=4 max=40 value=10></input>
       Scale
     </label>
-    <label>
-      <input id="basecolor" type="color" value="#61135f"></input>
-      Base Color
-    </label>
-    <section id=keydatelist>
-      <heading>
-        <h3>Key Dates</h3>
-        <button class=big id=addkeydate>✚</button>
-      </heading>
-    </section>
+  </section>
 
-    <section id=tasklist>
-      <heading>
-        <h3>Tasks</h3>
-        <button class=big id=addtask>✚</button>
-      </heading>
-    </section>
+  <section id=keydatelist>
+    <h3>Key Date</h3>
+  </section>
+
+  <section id=tasklist>
+    <h3>Task</h3>
   </section>
 
 </main>
+
+<nav>
+  <button class=big id=addkeydate>Add Key Date</button>
+  <button class=big id=addtask>Add Task</button>
+</nav>
+
 
 
 <figure id=timelinecontainer>
@@ -59,55 +63,58 @@
 
 
 <template id=tasktemplate>
-  <div class=task>
-    <button class="delete" type=text>❌</button>
-    <section>
-      <label>
-        <input name="name" type="text" placeholder="Task name" value="New Task"></input>
-        Name
-      </label>
-      <label>
-        <input name="from" type="date" value="2021-09-01"></input>
-        Start Date
-      </label>
-      <label>
-        <input name="to" type="date" value="2022-02-01"></input>
-        End Date
-      </label>
-      <label>
-        <input name="bg" type="color" value="#336699"></input>
-        Background
-      </label>
-      <label>
-        <input name="fg" type="color" value="#FFFFFF"></input>
-        Foreground
-      </label>
-      <label>
-        <input name="layer" type="number" value="1"></input>
-        Layer
-      </label>
-    </section>
-  </div>
+  <section>
+    <label>
+      <input name="name" type="text" placeholder="Task name" value="New Task"></input>
+      Name
+    </label>
+    <label>
+      <input name="from" type="date" value="2021-09-01"></input>
+      Start Date
+    </label>
+    <label>
+      <input name="to" type="date" value="2022-02-01"></input>
+      End Date
+    </label>
+    <label>
+      <input name="bg" type="color" value="#336699"></input>
+      Fill Colour
+    </label>
+    <label>
+      <input name="fg" type="color" value="#FFFFFF"></input>
+      Text Colour
+    </label>
+    <label>
+      <input name="layer" type="number" value="1"></input>
+      Layer
+    </label>
+    <label>
+      <button class="big delete" type=text>Delete</button>
+    </label>
+  </section>
 </template>
 
 
 
 <template id=keydatetemplate>
-  <div class=keydate>
-    <button class="delete" type=text>❌</button>
-    <section>
-      <label>
-        <input name="name" type="text" value="Something..."></input>
-        Name
-      </label>
-      <label>
-        <input name="keydate" type="date" value="2020-09-01"></input>
-        Start Date
-      </label>
-      <label>
-        <input name="color" type="color" value="#61135f"></input>
-        Colour
-      </label>
-    </section>
-  </div>
+  <section>
+    <label>
+      <input name="name" type="text" value="Something..."></input>
+      Name
+    </label>
+    <label>
+      <input name="keydate" type="date" value="2020-09-01"></input>
+      Start Date
+    </label>
+    <label></label>
+    <label></label>
+    <label>
+      <input name="color" type="color" value="#61135f"></input>
+      Text Colour
+    </label>
+    <label></label>
+    <label>
+      <button class="big delete" type=text>Delete</button>
+    </label>
+  </section>
 </template>

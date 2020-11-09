@@ -82,11 +82,12 @@ function redraw() {
   el.timelinecontainer.append(el.timeline);
 }
 
+const retval = {
+  keyDates: [],
+  tasks: [],
+};
+
 function gatherInputData() {
-  const retval = {
-    keyDates: [],
-    tasks: [],
-  };
 
   //  retval.tasks = generateDummyTasks(dummyStart, dummyEnd);
   const tasks = document.querySelectorAll('.task section');

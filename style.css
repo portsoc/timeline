@@ -5,8 +5,9 @@
   --fg: #000;
   --grid:
     "title title" auto
-    "control output" 1fr
-    / 20em auto;
+    "control addbuttons" auto
+    "output output" 1fr
+    / 1fr auto;
   --face: 'Helvetica Neue', 'sans serif';
 
   --barfg: var(--bg);
@@ -38,27 +39,60 @@ body {
   grid-template: var(--grid);
   color: var(--fg);
   background-color: var(--bg);
+  min-height: 100Vh;
 }
 
 body>* {
   padding: 1rem;
 }
 
-main, section {
-  grid-area: control;
+body>header        { grid-area: title; }
+main               { grid-area: control; }
+nav                { grid-area: addbuttons;}
+#timelinecontainer { grid-area: output; }
+
+nav {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+
+nav > button {
+  width: 5rem;
+  height: 5rem;
+}
+
+main {
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
   height: 100%;
 }
 
+section {
+  justify-content: left;
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  height: 100%;
+}
+
+section h2, section h3 {
+  min-width: 10rem;
+}
+
+
 section label {
+  display: flex;
+  flex-direction: column-reverse;
   padding-bottom: 0.25rem;
+  min-width: 10rem;
 }
 
 input {
   font-size: 80%;
-  width: 10em;
+  width: 8rem;
 }
 
 body>header {
@@ -73,7 +107,6 @@ body>header {
 }
 
 #timelinecontainer {
-  grid-area: output;
   background: var(--bg);
 }
 
@@ -131,15 +164,14 @@ heading h3 {
 
 button.big  {
   transition: 0.1s;
-  width: 2rem;
-  height: 2rem;
   background: var(--blue);
   color: var(--bg);
   font-weight: bold;
   font-size: 100%;
-  border-radius: 100%;
+  border-radius: 0.5rem;
   border: none;
   box-shadow: 0 0.25rem 0.25rem rgba(0,0,0,0.5);
+  padding: 0.25rem 1rem;
 }
 
 button.big:hover {
