@@ -38,15 +38,23 @@ function kill(e) {
   redraw();
 }
 
-function addKeyDate() {
+function addKeyDate(data) {
   const cloned = document.importNode(el.keydatetemplate.content, true);
 
-  const dateFields = Array.from(el.keydatelist.querySelectorAll('[name=keydate]'));
-  const lastDate = Math.max(...dateFields.map(el => Number(el.valueAsDate)));
-  if (lastDate === -Infinity) {
-    cloned.querySelector('[name=keydate]').value = el.datefrom.value;
+
+  if (data) {
+    colourIndex = ((colourIndex + 1) % colours.length);
+    cloned.querySelector('[name=name]').value = data.name;
+    cloned.querySelector('[name=keydate]').value = data.date;
+    cloned.querySelector('[name=color]').value = data.color;
   } else {
-    cloned.querySelector('[name=keydate]').valueAsDate = new Date(lastDate + 28 * DAY_MILLIS);
+    const dateFields = Array.from(el.keydatelist.querySelectorAll('[name=keydate]'));
+    const lastDate = Math.max(...dateFields.map(el => Number(el.valueAsDate)));
+    if (lastDate === -Infinity) {
+      cloned.querySelector('[name=keydate]').value = el.datefrom.value;
+    } else {
+      cloned.querySelector('[name=keydate]').valueAsDate = new Date(lastDate + 28 * DAY_MILLIS);
+    }
   }
 
   el.keydatelist.append(cloned);
@@ -57,21 +65,32 @@ function addKeyDate() {
   redraw();
 }
 
-function addTask() {
-  const cloned = document.importNode(el.tasktemplate.content, true);
+function addTask(data) {
+  const id = getUnique();
+  let cloned = document.importNode(el.tasktemplate.content, true);
+  cloned.id = id;
 
-  colourIndex = ((colourIndex + 1) % colours.length);
-  cloned.querySelector('[name=bg]').value = colours[colourIndex];
-  cloned.querySelector('[name=from]').value = el.datefrom.value;
-  cloned.querySelector('[name=to]').value = el.dateto.value;
-  cloned.querySelector('[name=layer]').value = findFirstLayerWithSpace();
+  if (data) {
+    colourIndex = ((colourIndex + 1) % colours.length);
+    cloned.querySelector('[name=name]').value = data.name;
+    cloned.querySelector('[name=bg]').value = data.bg;
+    cloned.querySelector('[name=from]').value = data.from;
+    cloned.querySelector('[name=to]').value = data.to;
+    cloned.querySelector('[name=layer]').value = data.layer;
+  } else {
+    colourIndex = ((colourIndex + 1) % colours.length);
+    cloned.querySelector('[name=bg]').value = colours[colourIndex];
+    cloned.querySelector('[name=from]').value = el.datefrom.value;
+    cloned.querySelector('[name=to]').value = el.dateto.value;
+    cloned.querySelector('[name=layer]').value = findFirstLayerWithSpace();
+    redraw();
+  }
 
   el.tasklist.append(cloned);
+  cloned = document.getElementById(id);
 
   const buttons = el.tasklist.querySelectorAll('button.delete');
   buttons[buttons.length - 1].addEventListener('click', kill);
-
-  redraw();
 }
 
 function redraw() {
@@ -326,9 +345,38 @@ async function updateDownloadLink(svgElement) {
   }
 }
 
-// todo - use if we want to do clickable image elements
-// function getUnique() {
-//   const allowed = 'abcdefghijklmnopqrstuvwxyz';
-//   const replacer = c => c & allowed[Math.floor(Math.random() * allowed.length)];
-//   return 'xxx-xxx-xxx'.replace(/[x]/g, replacer);
-// }
+function getUnique() {
+  const allowed = 'abcdefghijklmnopqrstuvwxyz';
+  const replacer = c => c & allowed[Math.floor(Math.random() * allowed.length)];
+  return 'xxx-xxx-xxx'.replace(/[x]/g, replacer);
+}
+
+
+window.addEventListener('dragover', e => e.preventDefault());
+window.addEventListener('drop', e => {
+  e.preventDefault();
+  const f = e.dataTransfer.files[0];
+  if (f.type.match('application/json')) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      addDataToUI( JSON.parse(reader.result) );
+    };
+    reader.readAsText(f);
+  }
+});
+
+function addDataToUI(data) {
+  if (data.tasks) {
+    for (const task of data.tasks) {
+      console.log('adding', task);
+      addTask(task);
+    }
+  }
+  if (data.keyDates) {
+    for (const kd of data.keyDates) {
+      console.log('adding', kd);
+      addKeyDate(kd);
+    }
+  }
+  redraw();
+}

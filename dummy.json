@@ -1,5 +1,5 @@
 {
-  "keydates": [
+  "keyDates": [
 
     {
       "name": "First",
@@ -22,16 +22,16 @@
   "tasks": [
     {
       "name": "perform example task",
-      "start": "2020-09-01",
-      "end": "2021-01-15",
+      "from": "2020-09-01",
+      "to": "2021-01-15",
       "bg": "#336699",
       "color": "#FFF",
       "layer": 0
     },
     {
       "name": "perform sub-task",
-      "start": "2020-09-22",
-      "end": "2021-09-29",
+      "from": "2020-09-22",
+      "to": "2021-09-29",
       "bg": "#339966",
       "color": "#FFF",
       "layer": 1
