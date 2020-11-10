@@ -210,6 +210,14 @@ g.button:hover rect {
   animation-duration: 2s;
 }
 
+.temporary-svg {
+  position: fixed;
+  background-color: #cff;
+  padding: 0;
+  margin: 0;
+  border: none;
+}
+
 @media all and (max-width: 60em) {
   section {
     flex-direction: column;

@@ -224,12 +224,9 @@ function draw(data, editControls) {
     drawTask(task);
   }
 
-  const keyDateSvgElements = [];
   for (const keyDate of data.keyDates) {
-    keyDateSvgElements.push(drawKeyDate(keyDate));
+    drawKeyDate(keyDate);
   }
-
-  // computeBR(drawing);
 
   // if drawing with editControls, add those
   if (editControls) {
@@ -240,32 +237,19 @@ function draw(data, editControls) {
 
     const addTaskBtn = drawButton(-leftOffset - editControlsSize, barHeight + 2, btnSize, addBtnHeight, 'Add Task');
     addTaskBtn.addEventListener('click', addTask);
+  } else {
+    // add the drawing to the document so sizing is available
+    drawing.classList.add('temporary-svg');
+    document.body.append(drawing);
+
+    trimSVG(drawing);
+
+    // drop from the document again
+    drawing.remove();
+    drawing.classList.remove('temporary-svg');
   }
 
-
   return drawing;
-
-
-  // compute how far up and right the key dates go
-  // this works only as long as CSS doesn't scale the SVG element
-  // function computeBR(drawing) {
-  //   const svgBCR = drawing.getBoundingClientRect();
-  //   let top = vertOffset;
-  //   let right = width;
-  //   if (keyDateSvgElements.length > 0) {
-  //     for (const keyDateEl of keyDateSvgElements) {
-  //       const elBCR = keyDateEl.getBoundingClientRect();
-  //       const elTopDist = elBCR.top - svgBCR.top;
-  //       top = Math.min(top, elTopDist);
-  //       const elRightDist = svgBCR.right - elBCR.right;
-  //       right = Math.min(right, elRightDist);
-  //     }
-  //     drawing.setAttribute('width', width - right + 2);
-  //     drawing.setAttribute('height', height - top + 2);
-  //     drawing.setAttribute('viewBox',
-  //       `${-barHeight - 2} ${-vertOffset + top - 2} ${width - right + 2} ${height - top + 2}`);
-  //   }
-  // }
 
   function walkTreeToFindG(el) {
     if (el.tagName === 'svg') return null;
@@ -354,7 +338,6 @@ function draw(data, editControls) {
     if (editControls) g.addEventListener('click', editThis);
     g.append(dateEl, nameEl);
     drawing.append(g);
-    return g;
   }
 
   function dateX(date) {
@@ -475,4 +458,41 @@ function addDataToUI(data) {
     }
   }
   redraw();
+}
+
+// adjust the size and viewbox of the SVG element to actual contents
+function trimSVG(svgEl) {
+  const svgBCR = svgEl.getBoundingClientRect();
+  let top = Infinity;
+  let right = Infinity;
+  let bottom = Infinity;
+  let left = Infinity;
+  for (const element of svgEl.children) {
+    const elBCR = element.getBoundingClientRect();
+
+    const elTopDist = elBCR.top - svgBCR.top;
+    top = Math.min(top, elTopDist);
+
+    const elBottomDist = svgBCR.bottom - elBCR.bottom;
+    bottom = Math.min(bottom, elBottomDist);
+
+    const elRightDist = svgBCR.right - elBCR.right;
+    right = Math.min(right, elRightDist);
+
+    const elLeftDist = elBCR.left - svgBCR.left;
+    left = Math.min(left, elLeftDist);
+  }
+
+  top -= 2;
+  bottom -= 2;
+  right -= 2;
+  left -= 2;
+
+  svgEl.width.baseVal.value -= right + left;
+  svgEl.viewBox.baseVal.width -= right + left;
+  svgEl.viewBox.baseVal.x += left;
+
+  svgEl.height.baseVal.value -= top + bottom;
+  svgEl.viewBox.baseVal.height -= top + bottom;
+  svgEl.viewBox.baseVal.y += top;
 }
