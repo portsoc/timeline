@@ -186,10 +186,9 @@ function draw(data, editControls) {
   const height = vertOffset + taskStart + tasksHeight + 2;
   const editControlsSize = editControls ? 5 * UNIT : 0;
 
-
   // create new SVG
   const drawing = svg('svg', {
-    width,
+    width: width + editControlsSize,
     height: height,
     viewBox: `${-barHeight - 2 - editControlsSize} ${-vertOffset} ${width + editControlsSize} ${height}`,
     xmlns: SVG_NS,
