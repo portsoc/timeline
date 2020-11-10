@@ -45,7 +45,8 @@ function addKeyDate(data) {
   el.keydatelist.append(cloned);
   cloned = document.getElementById(id);
 
-  if (data) {
+  // data may be an event or an array
+  if (Array.isArray(data)) {
     colourIndex = ((colourIndex + 1) % colours.length);
     cloned.querySelector('[name=name]').value = data.name;
     cloned.querySelector('[name=keydate]').value = data.date;
@@ -66,7 +67,6 @@ function addKeyDate(data) {
   redraw();
 
   makeVisible(cloned);
-
 }
 
 function addTask(data) {
@@ -75,9 +75,9 @@ function addTask(data) {
   cloned.querySelector('section').id = id;
   el.tasklist.append(cloned);
   cloned = document.getElementById(id);
-  
 
-  if (data) {
+  // data may be an event or an array
+  if (Array.isArray(data)) {
     colourIndex = ((colourIndex + 1) % colours.length);
     cloned.querySelector('[name=name]').value = data.name;
     cloned.querySelector('[name=bg]').value = data.bg;
@@ -221,7 +221,7 @@ function draw(data) {
     keyDateSvgElements.push(drawKeyDate(keyDate));
   }
 
-  computeBR(drawing);
+  // computeBR(drawing);
 
   return drawing;
 
@@ -392,7 +392,7 @@ window.addEventListener('drop', e => {
   if (f.type.match('application/json')) {
     const reader = new FileReader();
     reader.onload = e => {
-      addDataToUI( JSON.parse(reader.result) );
+      addDataToUI(JSON.parse(reader.result));
     };
     reader.readAsText(f);
   }
