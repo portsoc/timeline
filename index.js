@@ -30,6 +30,10 @@ function findFirstLayerWithSpace() {
 function init() {
   document.querySelectorAll('[id]').forEach(e => { el[e.id] = e; });
   document.addEventListener('input', redraw);
+
+  window.addEventListener('dragover', e => e.preventDefault());
+  window.addEventListener('drop', acceptDrop);
+
   redraw();
 }
 
@@ -39,11 +43,9 @@ function kill(e) {
 }
 
 function addKeyDate(data) {
-  const id = getUnique();
-  let cloned = document.importNode(el.keydatetemplate.content, true);
-  cloned.querySelector('section').id = id;
+  const cloned = document.importNode(el.keydatetemplate.content, true).firstElementChild;
+  cloned.id = getUnique();
   el.keydatelist.append(cloned);
-  cloned = document.getElementById(id);
 
   // data may be an event or an array
   if (Array.isArray(data)) {
@@ -70,11 +72,9 @@ function addKeyDate(data) {
 }
 
 function addTask(data) {
-  const id = getUnique();
-  let cloned = document.importNode(el.tasktemplate.content, true);
-  cloned.querySelector('section').id = id;
+  const cloned = document.importNode(el.tasktemplate.content, true).firstElementChild;
+  cloned.id = getUnique();
   el.tasklist.append(cloned);
-  cloned = document.getElementById(id);
 
   // data may be an event or an array
   if (Array.isArray(data)) {
@@ -409,7 +409,12 @@ async function updateDownloadLink(svgElement) {
 }
 
 function updateDownloadJSONLink() {
-  const timelineData = JSON.stringify(gatherInputData(), null, 4);
+  // remove IDs because they aren't useful in the JSON
+  const data = gatherInputData();
+  data.keyDates.forEach(obj => delete obj.id);
+  data.tasks.forEach(obj => delete obj.id);
+
+  const timelineData = JSON.stringify(data, null, 4);
   const encodedUri = 'data:application/javascript;charset=utf-8,' + encodeURIComponent(timelineData);
   el.downloadjson.href = encodedUri;
 }
@@ -421,9 +426,7 @@ function getUnique() {
   return 'xxx-xxx-xxx'.replace(/[x]/g, replacer);
 }
 
-
-window.addEventListener('dragover', e => e.preventDefault());
-window.addEventListener('drop', e => {
+function acceptDrop(e) {
   e.preventDefault();
   const f = e.dataTransfer.files[0];
   if (f.type === 'application/json') {
@@ -442,7 +445,7 @@ window.addEventListener('drop', e => {
     };
     reader.readAsText(f);
   }
-});
+}
 
 function addDataToUI(data) {
   if (data.tasks) {
