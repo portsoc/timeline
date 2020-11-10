@@ -1,21 +1,19 @@
 :root {
   --purple: #61135f;
   --blue: #009fff;
+  --alt-blue: #0080e0;
   --bg: #fff;
   --fg: #000;
   --grid:
-    "title title" auto
-    "addbuttons output" auto
-    "control control" 1fr
-    / auto 1fr;
+    "title" auto
+    "output" auto
+    "control" 1fr
+    / 1fr;
   --face: 'Helvetica Neue', 'sans serif';
 
   --barfg: var(--bg);
   --taskbg: #61135f33;
   --highlight: #EEEE33FF;
-  --unit: 16px;
-  --basecolor: var(--purple);
-  --barcolor: var(--basecolor);
 }
 
 * {
@@ -30,7 +28,7 @@ body {
   grid-template: var(--grid);
   color: var(--fg);
   background-color: var(--bg);
-  min-height: 100Vh;
+  height: 100vh;
 }
 
 body>* {
@@ -38,28 +36,20 @@ body>* {
 }
 
 body>header        { grid-area: title; }
-main               { grid-area: control; }
-nav                { grid-area: addbuttons;}
+#maincontainer     { grid-area: control; }
 #timelinecontainer { grid-area: output; }
-
-nav {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-nav > button {
-  width: 5rem;
-  height: 5rem;
-}
 
 main {
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
-  max-height: 40vh;
-  overflow: scroll;
+  justify-content: flex-end;
+}
 
+#maincontainer {
+  overflow: auto;
+  height: 100%;
+  max-width: 100vw;
 }
 
 section {
@@ -99,38 +89,7 @@ body>header {
 
 #timelinecontainer {
   background: var(--bg);
-  height: 40vh;
-
-}
-
-svg {
-  /* setting the width should disable the automatic sizing bit in JS */
-  /* max-width: 100%; */
-  font-size: var(--unit);
-  font-family: var(--face);
-}
-
-
-#bar {
-  fill: var(--barcolor);
-}
-
-.month-marker {
-  fill: var(--barfg);
-  font-weight: bold;
-  font-size: 110%;
-}
-
-.task>text {
-  dominant-baseline: central;
-}
-
-.key-date {
-  fill: var(--basecolor);
-}
-
-.key-date .date {
-  font-weight: bold;
+  overflow-x: auto;
 }
 
 section {
@@ -163,20 +122,32 @@ button.big  {
   font-size: 100%;
   border-radius: 0.5rem;
   border: none;
-  box-shadow: 0 0.25rem 0.25rem rgba(0,0,0,0.5);
   padding: 0.25rem 1rem;
   min-width: 3rem;
-
+  cursor: pointer;
+  margin-left: auto;
 }
 
 button.big:hover {
-  filter: brightness(110%);
-  box-shadow: 0 0.25rem 0.25rem rgba(0,0,0,0.75);
+  background: var(--alt-blue);
 }
 
 button.big:focus {
   outline: none;
 }
+
+g.button rect {
+  fill: var(--blue);
+}
+
+g.button text {
+  fill: var(--bg);
+}
+
+g.button:hover rect {
+  fill: var(--alt-blue);
+}
+
 
 .task, .keydate {
   position: relative;

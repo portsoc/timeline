@@ -2,6 +2,7 @@
 <html lang="en">
 <meta charset="UTF-8">
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="svg.css">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Timeline Generator</title>
 
@@ -12,43 +13,36 @@
   <a id=downloadsvg download="timeline.svg">download SVG</a>
 </header>
 
-<main>
-  <section>
-    <h2>Timeline</h2>
-    <label>
-    </label>
-    <label>
-      <input id="datefrom" type="date" value="2020-09-01"></input>
-      From
-    </label>
-    <label>
-      <input id="dateto" type="date" value="2021-02-01"></input>
-      To
-    </label>
-    <label>
-      <input id="basecolor" type="color" value="#61135f"></input>
-      Fill
-    </label>
-    <label></label>
-    <label>
-      <input id="daywidth" type=range min=4 max=40 value=10></input>
-      Scale
-    </label>
-  </section>
+<div id="maincontainer">
+  <main>
+    <section>
+      <h2>Timeline</h2>
+      <label>
+      </label>
+      <label>
+        <input id="datefrom" type="date" value="2020-09-01"></input>
+        From
+      </label>
+      <label>
+        <input id="dateto" type="date" value="2021-02-01"></input>
+        To
+      </label>
+      <label>
+        <input id="basecolor" type="color" value="#61135f"></input>
+        Fill
+      </label>
+      <label></label>
+      <label>
+        <input id="daywidth" type=range min=4 max=40 value=10></input>
+        Scale
+      </label>
+    </section>
 
-  <div>
     <div id=keydatelist></div>
     <div id=tasklist></div>
-  </div>
 
-</main>
-
-<nav>
-  <button class=big id=addkeydate>Add Key Date</button>
-  <button class=big id=addtask>Add Task</button>
-</nav>
-
-
+  </main>
+</div>
 
 <figure id=timelinecontainer>
   <svg id=timeline width=1000 height=600 viewBox="0 0 1000 600">
@@ -86,9 +80,7 @@
       <input name="layer" type="number" value="1"></input>
       Layer
     </label>
-    <label>
-      <button class="big delete" type=text>Delete</button>
-    </label>
+    <button class="big delete" type=text>Delete</button>
   </section>
 </template>
 
@@ -112,8 +104,6 @@
       Text
     </label>
     <label></label>
-    <label>
-      <button class="big delete" type=text>Delete</button>
-    </label>
+    <button class="big delete" type=text>Delete</button>
   </section>
 </template>

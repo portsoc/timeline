@@ -2,6 +2,9 @@
 // page for safe shorthand use
 
 const UNIT = 16; // default font size
+const VERT_OFFSET = 300;
+const BAR_HEIGHT = UNIT * 2.5;
+
 const DAY_MILLIS = 1000 * 60 * 60 * 24;
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const el = {};
@@ -27,9 +30,6 @@ function findFirstLayerWithSpace() {
 function init() {
   document.querySelectorAll('[id]').forEach(e => { el[e.id] = e; });
   document.addEventListener('input', redraw);
-  document.addEventListener('change', redraw);
-  el.addkeydate.addEventListener('click', addKeyDate);
-  el.addtask.addEventListener('click', addTask);
   redraw();
 }
 
@@ -102,9 +102,10 @@ function addTask(data) {
 function redraw() {
   const timelineData = gatherInputData();
   el.timeline.remove();
-  el.timeline = draw(timelineData);
-  updateDownloadLink(el.timeline);
+  el.timeline = draw(timelineData, true);
   el.timelinecontainer.append(el.timeline);
+
+  updateDownloadLink(draw(timelineData, false));
 }
 
 function gatherInputData() {
@@ -137,7 +138,6 @@ function gatherInputData() {
       date: new Date(getNameValue(keydateform, 'keydate')),
       color: getNameValue(keydateform, 'color'),
     };
-    console.log(keydate.color);
     retval.keyDates.push(keydate);
   }
 
@@ -158,43 +158,51 @@ function gatherInputData() {
   retval.startDate = new Date(Math.min(...keyDates.concat(taskStartDates, domStartDate).map(d => Number(d))));
   retval.endDate = new Date(Math.max(...keyDates.concat(taskEndDates, domEndDate).map(d => Number(d))));
 
+  // todo find why the scale scales things more than expected
   retval.dayWidth = el.daywidth.value / 4;
   retval.baseColor = el.basecolor.value;
 
   return retval;
 }
 
-function draw(data) {
+function draw(data, editControls) {
   const firstDate = new Date(data.startDate.getFullYear(), data.startDate.getMonth(), 1);
 
   const days = (data.endDate - firstDate) / DAY_MILLIS * data.dayWidth;
 
-  const barHeight = UNIT * 2.5;
+  const barHeight = BAR_HEIGHT;
   const halfBarHeight = barHeight / 2;
   const taskHeight = UNIT * 1.4;
   const taskStart = barHeight * 1.5;
   const taskPad = UNIT * 0.2;
 
-  document.documentElement.style.setProperty('--unit', UNIT + 'px');
-  document.documentElement.style.setProperty('--basecolor', data.baseColor);
+  const addBtnHeight = UNIT * 9;
 
   const width = days + barHeight * 10;
-  const vertOffset = 300; // todo auto adjust this
+  const vertOffset = VERT_OFFSET; // todo auto adjust this
+  const leftOffset = barHeight;
   const taskLayers = Math.max(0, ...data.tasks.map(t => t.layer)) + 1;
-  const height = vertOffset + taskStart + taskHeight * taskLayers + 2;
+  const tasksHeight = Math.max(taskHeight * taskLayers, addBtnHeight - taskStart + barHeight);
+  const height = vertOffset + taskStart + tasksHeight + 2;
+  const editControlsSize = editControls ? 5 * UNIT : 0;
 
 
   // create new SVG
   const drawing = svg('svg', {
     width,
     height: height,
-    viewBox: `${-barHeight - 2} ${-vertOffset} ${width} ${height}`,
+    viewBox: `${-barHeight - 2 - editControlsSize} ${-vertOffset} ${width + editControlsSize} ${height}`,
     xmlns: SVG_NS,
+    style: `
+      --unit: ${UNIT}px;
+      --basecolor: ${data.baseColor};`,
   });
 
+
+  // todo add clicking on the bar
   const barEl = svg('path', {
     id: 'bar',
-    d: `M${-barHeight},0 H${days + barHeight} L${days + barHeight + halfBarHeight},${halfBarHeight} L${days + barHeight},${barHeight} H${-barHeight} z`,
+    d: `M${-leftOffset},0 H${days + leftOffset} L${days + leftOffset + halfBarHeight},${halfBarHeight} L${days + leftOffset},${barHeight} H${-barHeight} z`,
   });
   drawing.append(barEl);
 
@@ -223,29 +231,41 @@ function draw(data) {
 
   // computeBR(drawing);
 
+  // if drawing with editControls, add those
+  if (editControls) {
+    const btnSize = editControlsSize - UNIT;
+
+    const addKeyDateBtn = drawButton(-leftOffset - editControlsSize, -addBtnHeight - 2, btnSize, addBtnHeight, 'Add Key Date');
+    addKeyDateBtn.addEventListener('click', addKeyDate);
+
+    const addTaskBtn = drawButton(-leftOffset - editControlsSize, barHeight + 2, btnSize, addBtnHeight, 'Add Task');
+    addTaskBtn.addEventListener('click', addTask);
+  }
+
+
   return drawing;
 
 
   // compute how far up and right the key dates go
   // this works only as long as CSS doesn't scale the SVG element
-  function computeBR(drawing) {
-    const svgBCR = drawing.getBoundingClientRect();
-    let top = vertOffset;
-    let right = width;
-    if (keyDateSvgElements.length > 0) {
-      for (const keyDateEl of keyDateSvgElements) {
-        const elBCR = keyDateEl.getBoundingClientRect();
-        const elTopDist = elBCR.top - svgBCR.top;
-        top = Math.min(top, elTopDist);
-        const elRightDist = svgBCR.right - elBCR.right;
-        right = Math.min(right, elRightDist);
-      }
-      drawing.setAttribute('width', width - right + 2);
-      drawing.setAttribute('height', height - top + 2);
-      drawing.setAttribute('viewBox',
-        `${-barHeight - 2} ${-vertOffset + top - 2} ${width - right + 2} ${height - top + 2}`);
-    }
-  }
+  // function computeBR(drawing) {
+  //   const svgBCR = drawing.getBoundingClientRect();
+  //   let top = vertOffset;
+  //   let right = width;
+  //   if (keyDateSvgElements.length > 0) {
+  //     for (const keyDateEl of keyDateSvgElements) {
+  //       const elBCR = keyDateEl.getBoundingClientRect();
+  //       const elTopDist = elBCR.top - svgBCR.top;
+  //       top = Math.min(top, elTopDist);
+  //       const elRightDist = svgBCR.right - elBCR.right;
+  //       right = Math.min(right, elRightDist);
+  //     }
+  //     drawing.setAttribute('width', width - right + 2);
+  //     drawing.setAttribute('height', height - top + 2);
+  //     drawing.setAttribute('viewBox',
+  //       `${-barHeight - 2} ${-vertOffset + top - 2} ${width - right + 2} ${height - top + 2}`);
+  //   }
+  // }
 
   function walkTreeToFindG(el) {
     if (el.tagName === 'svg') return null;
@@ -254,10 +274,34 @@ function draw(data) {
   }
 
   function editThis(e) {
+    // todo know better what's being edited
+    // e.g. clicking on keydate's date should edit the date
     const g = walkTreeToFindG(e.target);
     const idInPage = g.id.substring(2);
     const elem = document.getElementById(idInPage);
     makeVisible(elem);
+  }
+
+  function drawButton(x, y, width, height, text) {
+    const g = svg('g', { class: 'button' });
+    const boxEl = svg('rect', {
+      class: 'rect',
+      x,
+      y,
+      width,
+      height,
+      rx: UNIT / 2,
+    });
+    const textEl = svg('text', {
+      transform: `translate(${x + width / 2},${y + height / 2}) rotate(-90)`,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+    });
+    textEl.textContent = text;
+
+    g.append(boxEl, textEl);
+    drawing.append(g);
+    return g;
   }
 
   function drawTask(task) {
@@ -281,7 +325,7 @@ function draw(data) {
     });
     textEl.textContent = task.name;
 
-    g.addEventListener('click', editThis);
+    if (editControls) g.addEventListener('click', editThis);
     g.append(barEl, textEl);
     drawing.append(g);
   }
@@ -307,7 +351,7 @@ function draw(data) {
     });
     nameEl.textContent = keyDate.name;
 
-    g.addEventListener('click', editThis);
+    if (editControls) g.addEventListener('click', editThis);
     g.append(dateEl, nameEl);
     drawing.append(g);
     return g;
@@ -354,7 +398,7 @@ async function updateDownloadLink(svgElement) {
   try {
     // load CSS if we haven't already
     if (css == null) {
-      const response = await fetch('style.css');
+      const response = await fetch('svg.css');
       if (response.ok) css = await response.text();
     }
 
@@ -380,7 +424,7 @@ async function updateDownloadLink(svgElement) {
 
 function getUnique() {
   const allowed = 'abcdefghijklmnopqrstuvwxyz';
-  const replacer = c => allowed[Math.floor(Math.random() * allowed.length)];
+  const replacer = () => allowed[Math.floor(Math.random() * allowed.length)];
   return 'xxx-xxx-xxx'.replace(/[x]/g, replacer);
 }
 
@@ -391,7 +435,7 @@ window.addEventListener('drop', e => {
   const f = e.dataTransfer.files[0];
   if (f.type.match('application/json')) {
     const reader = new FileReader();
-    reader.onload = e => {
+    reader.onload = () => {
       addDataToUI(JSON.parse(reader.result));
     };
     reader.readAsText(f);
