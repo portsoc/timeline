@@ -87,6 +87,10 @@ body>header {
   max-width: 100vw;
 }
 
+body>header>h1 {
+  flex-grow: 1;
+}
+
 #timelinecontainer {
   background: var(--bg);
   overflow-x: auto;
@@ -182,13 +186,14 @@ g.button:hover rect {
   outline: none;
 }
 
-#downloadsvg {
+[download] {
   border: grey thin solid;
   background-color: var(--bg);
   color: var(--fg);
   display: block;
   padding: 0.25em;
   border-radius: 0.25em;
+  margin-left: 1rem;
 }
 
 @keyframes pulse {
