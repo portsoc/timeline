@@ -38,7 +38,7 @@ function init() {
 }
 
 function kill(e) {
-  e.target.parentElement.parentElement.remove();
+  e.target.parentElement.remove();
   redraw();
 }
 
