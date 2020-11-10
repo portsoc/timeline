@@ -106,6 +106,7 @@ function redraw() {
   el.timelinecontainer.append(el.timeline);
 
   updateDownloadLink(draw(timelineData, false));
+  updateDownloadJSONLink();
 }
 
 function gatherInputData() {
@@ -409,7 +410,10 @@ async function updateDownloadLink(svgElement) {
     clone.append(style);
 
     // now update the download URL
-    const svgContent = clone.outerHTML;
+    let svgContent = clone.outerHTML;
+
+    svgContent += '<!-- sEpArAtOr' + JSON.stringify(gatherInputData()) + 'sEpArAtOr -->';
+
     const encodedUri = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgContent);
     el.downloadsvg.href = encodedUri;
   } catch (e) {
@@ -422,6 +426,13 @@ async function updateDownloadLink(svgElement) {
   }
 }
 
+function updateDownloadJSONLink() {
+  const timelineData = JSON.stringify(gatherInputData(), null, 4);
+  const encodedUri = 'data:application/javascript;charset=utf-8,' + encodeURIComponent(timelineData);
+  el.downloadjson.href = encodedUri;
+}
+
+
 function getUnique() {
   const allowed = 'abcdefghijklmnopqrstuvwxyz';
   const replacer = () => allowed[Math.floor(Math.random() * allowed.length)];
@@ -433,10 +444,19 @@ window.addEventListener('dragover', e => e.preventDefault());
 window.addEventListener('drop', e => {
   e.preventDefault();
   const f = e.dataTransfer.files[0];
-  if (f.type.match('application/json')) {
+  if (f.type === 'application/json') {
     const reader = new FileReader();
     reader.onload = () => {
       addDataToUI(JSON.parse(reader.result));
+    };
+    reader.readAsText(f);
+  }
+
+  if (f.type === 'image/svg+xml') {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const parts = reader.result.split('sEpArAtOr');
+      addDataToUI(JSON.parse(parts[1]));
     };
     reader.readAsText(f);
   }
