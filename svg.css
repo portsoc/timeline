@@ -32,7 +32,7 @@ g.button text {
   font-size: 110%;
 }
 
-.task>text {
+.task text {
   dominant-baseline: central;
 }
 

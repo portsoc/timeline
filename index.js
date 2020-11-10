@@ -119,7 +119,6 @@ function gatherInputData() {
     tasks: [],
   };
 
-  //  retval.tasks = generateDummyTasks(dummyStart, dummyEnd);
   const tasks = document.querySelectorAll('#tasklist section');
   for (const taskform of tasks) {
     const task = {
@@ -130,11 +129,11 @@ function gatherInputData() {
       bg: getNameValue(taskform, 'bg'),
       color: getNameValue(taskform, 'fg'),
       layer: getNameValue(taskform, 'layer'),
+      link: getNameValue(taskform, 'link'),
     };
     retval.tasks.push(task);
   }
 
-  // retval.keyDates = generateDummyKeyDates(dummyStart, dummyEnd);
   const dates = document.querySelectorAll('#keydatelist section');
   for (const keydateform of dates) {
     const keydate = {
@@ -142,6 +141,7 @@ function gatherInputData() {
       name: getNameValue(keydateform, 'name'),
       date: new Date(getNameValue(keydateform, 'keydate')),
       color: getNameValue(keydateform, 'color'),
+      link: getNameValue(keydateform, 'link'),
     };
     retval.keyDates.push(keydate);
   }
@@ -150,7 +150,6 @@ function gatherInputData() {
   function getNameValue(elem, thing) {
     return elem.querySelector(`[name=${thing}`).value;
   }
-
 
   // calculate start/end date from the key and task dates
   const keyDates = retval.keyDates.map(k => k.date);
@@ -257,11 +256,12 @@ function draw(data, editControls) {
 
   function walkTreeToFindG(el) {
     if (el.tagName === 'svg') return null;
-    if (el.tagName === 'g') return el;
+    if (el.tagName === 'a') return el;
     return walkTreeToFindG(el.parentElement);
   }
 
   function editThis(e) {
+    e.preventDefault();
     // todo know better what's being edited
     // e.g. clicking on keydate's date should edit the date
     const g = walkTreeToFindG(e.target);
@@ -296,7 +296,11 @@ function draw(data, editControls) {
     const y = taskStart + task.layer * taskHeight;
     const x = dateX(task.start);
     const width = dateX(task.end) - x;
-    const g = svg('g', { id: 'g-' + task.id, class: 'task' });
+    const anchor = svg('a', { id: 'g-' + task.id, class: 'task' });
+    if (task.link) {
+      anchor.setAttribute('href', task.link);
+    }
+
     const barEl = svg('rect', {
       class: 'rect',
       x,
@@ -313,15 +317,20 @@ function draw(data, editControls) {
     });
     textEl.textContent = task.name;
 
-    if (editControls) g.addEventListener('click', editThis);
-    g.append(barEl, textEl);
-    drawing.append(g);
+    if (editControls) anchor.addEventListener('click', editThis);
+    anchor.append(barEl, textEl);
+    drawing.append(anchor);
   }
 
   function drawKeyDate(keyDate) {
     const y = 0;
     const x1 = dateX(keyDate.date);
-    const g = svg('g', { id: 'g-' + keyDate.id, class: 'key-date' });
+    const anchor = svg('a', { id: 'g-' + keyDate.id, class: 'key-date' });
+    if (keyDate.link) {
+      anchor.setAttribute('href', keyDate.link);
+    }
+
+
     const style = keyDate.color ? `fill: ${keyDate.color}` : '';
 
     const dateEl = svg('text', {
@@ -339,14 +348,21 @@ function draw(data, editControls) {
     });
     nameEl.textContent = keyDate.name;
 
-    if (editControls) g.addEventListener('click', editThis);
-    g.append(dateEl, nameEl);
-    drawing.append(g);
+    if (editControls) anchor.addEventListener('click', editThis);
+    anchor.append(dateEl, nameEl);
+    drawing.append(anchor);
   }
 
   function dateX(date) {
     return dayDiff(firstDate, date) * data.dayWidth;
   }
+}
+
+function wrapWithAnchor(el, href) {
+  if (!href) return el;
+  const a = svg('a', { href });
+  a.append(el);
+  return a;
 }
 
 function makeVisible(elem) {
