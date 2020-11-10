@@ -12,6 +12,7 @@
 
   --barfg: var(--bg);
   --taskbg: #61135f33;
+  --highlight: #EEEE33FF;
   --unit: 16px;
   --basecolor: var(--purple);
   --barcolor: var(--basecolor);
@@ -219,7 +220,19 @@ button.big:focus {
   border-radius: 0.25em;
 }
 
+@keyframes pulse {
+  /* 0% { filter: invert(0%); }
+  10% { filter: invert(100%); }
+  100% { filter: invert(0%); } */
+  0% { background: var(--taskbg); }
+  10% { background: var(--highlight); }
+  100% { background: var(--taskbg); }
+}
 
+.highlight {
+  animation-name: pulse;
+  animation-duration: 2s;
+}
 
 @media all and (max-width: 60em) {
   section {

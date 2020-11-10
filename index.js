@@ -39,8 +39,11 @@ function kill(e) {
 }
 
 function addKeyDate(data) {
-  const cloned = document.importNode(el.keydatetemplate.content, true);
-
+  const id = getUnique();
+  let cloned = document.importNode(el.keydatetemplate.content, true);
+  cloned.querySelector('section').id = id;
+  el.keydatelist.append(cloned);
+  cloned = document.getElementById(id);
 
   if (data) {
     colourIndex = ((colourIndex + 1) % colours.length);
@@ -57,18 +60,22 @@ function addKeyDate(data) {
     }
   }
 
-  el.keydatelist.append(cloned);
-
   const buttons = el.keydatelist.querySelectorAll('button.delete');
   buttons[buttons.length - 1].addEventListener('click', kill);
 
   redraw();
+
+  makeVisible(cloned);
+
 }
 
 function addTask(data) {
   const id = getUnique();
   let cloned = document.importNode(el.tasktemplate.content, true);
-  cloned.id = id;
+  cloned.querySelector('section').id = id;
+  el.tasklist.append(cloned);
+  cloned = document.getElementById(id);
+  
 
   if (data) {
     colourIndex = ((colourIndex + 1) % colours.length);
@@ -86,11 +93,10 @@ function addTask(data) {
     redraw();
   }
 
-  el.tasklist.append(cloned);
-  cloned = document.getElementById(id);
-
   const buttons = el.tasklist.querySelectorAll('button.delete');
   buttons[buttons.length - 1].addEventListener('click', kill);
+
+  makeVisible(cloned);
 }
 
 function redraw() {
@@ -111,6 +117,7 @@ function gatherInputData() {
   const tasks = document.querySelectorAll('#tasklist section');
   for (const taskform of tasks) {
     const task = {
+      id: taskform.id,
       name: getNameValue(taskform, 'name'),
       start: new Date(getNameValue(taskform, 'from')),
       end: new Date(getNameValue(taskform, 'to')),
@@ -125,6 +132,7 @@ function gatherInputData() {
   const dates = document.querySelectorAll('#keydatelist section');
   for (const keydateform of dates) {
     const keydate = {
+      id: keydateform.id,
       name: getNameValue(keydateform, 'name'),
       date: new Date(getNameValue(keydateform, 'keydate')),
       color: getNameValue(keydateform, 'color'),
@@ -239,12 +247,24 @@ function draw(data) {
     }
   }
 
+  function walkTreeToFindG(el) {
+    if (el.tagName === 'svg') return null;
+    if (el.tagName === 'g') return el;
+    return walkTreeToFindG(el.parentElement);
+  }
+
+  function editThis(e) {
+    const g = walkTreeToFindG(e.target);
+    const idInPage = g.id.substring(2);
+    const elem = document.getElementById(idInPage);
+    makeVisible(elem);
+  }
 
   function drawTask(task) {
     const y = taskStart + task.layer * taskHeight;
     const x = dateX(task.start);
     const width = dateX(task.end) - x;
-    const g = svg('g', { class: 'task' });
+    const g = svg('g', { id: 'g-' + task.id, class: 'task' });
     const barEl = svg('rect', {
       class: 'rect',
       x,
@@ -260,6 +280,8 @@ function draw(data) {
       style: `fill: ${task.color}`,
     });
     textEl.textContent = task.name;
+
+    g.addEventListener('click', editThis);
     g.append(barEl, textEl);
     drawing.append(g);
   }
@@ -267,7 +289,7 @@ function draw(data) {
   function drawKeyDate(keyDate) {
     const y = 0;
     const x1 = dateX(keyDate.date);
-    const g = svg('g', { class: 'key-date' });
+    const g = svg('g', { id: 'g-' + keyDate.id, class: 'key-date' });
     const style = keyDate.color ? `fill: ${keyDate.color}` : '';
 
     const dateEl = svg('text', {
@@ -285,6 +307,7 @@ function draw(data) {
     });
     nameEl.textContent = keyDate.name;
 
+    g.addEventListener('click', editThis);
     g.append(dateEl, nameEl);
     drawing.append(g);
     return g;
@@ -295,6 +318,16 @@ function draw(data) {
   }
 }
 
+function makeVisible(elem) {
+  elem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  elem.classList.add('highlight');
+  setTimeout(() => { elem.classList.remove('highlight'); }, 2000);
+  const firstInput = elem.querySelector('input');
+  if (firstInput) {
+    firstInput.focus();
+    firstInput.select();
+  }
+}
 
 function dayDiff(date1, date2) {
   return (date2 - date1) / DAY_MILLIS;
@@ -347,7 +380,7 @@ async function updateDownloadLink(svgElement) {
 
 function getUnique() {
   const allowed = 'abcdefghijklmnopqrstuvwxyz';
-  const replacer = c => c & allowed[Math.floor(Math.random() * allowed.length)];
+  const replacer = c => allowed[Math.floor(Math.random() * allowed.length)];
   return 'xxx-xxx-xxx'.replace(/[x]/g, replacer);
 }
 
