@@ -10,7 +10,8 @@
 
 <header>
   <h1>Timeline Generator</h1>
-  <a id=downloadjson download="timeline.json">download JSON</a>
+  <span class=drophere title="drop a downloaded JSON file on the page to add data">drop data file here</span>
+  <a id=downloadjson download="timeline.json">download data file</a>
   <a id=downloadsvg download="timeline.svg">download SVG</a>
 </header>
 
@@ -34,7 +35,7 @@
       </label>
       <label></label>
       <label>
-        <input id="daywidth" type=range min=4 max=40 value=10></input>
+        <input id="daywidth" type=range min=10 max=100 value=25></input>
         Scale
       </label>
     </section>

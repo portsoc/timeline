@@ -186,6 +186,7 @@ g.button:hover rect {
   outline: none;
 }
 
+.drophere,
 [download] {
   border: grey thin solid;
   background-color: var(--bg);

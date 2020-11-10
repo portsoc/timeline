@@ -43,15 +43,17 @@ function kill(e) {
 }
 
 function addKeyDate(data) {
+  if (data instanceof Event) data = null;
+
   const cloned = document.importNode(el.keydatetemplate.content, true).firstElementChild;
   cloned.id = getUnique();
   el.keydatelist.append(cloned);
 
   // data may be an event or an array
-  if (Array.isArray(data)) {
+  if (data) {
     colourIndex = ((colourIndex + 1) % colours.length);
     cloned.querySelector('[name=name]').value = data.name;
-    cloned.querySelector('[name=keydate]').value = data.date;
+    cloned.querySelector('[name=keydate]').valueAsDate = new Date(data.date);
     cloned.querySelector('[name=color]').value = data.color;
   } else {
     const dateFields = Array.from(el.keydatelist.querySelectorAll('[name=keydate]'));
@@ -72,17 +74,19 @@ function addKeyDate(data) {
 }
 
 function addTask(data) {
+  if (data instanceof Event) data = null;
   const cloned = document.importNode(el.tasktemplate.content, true).firstElementChild;
   cloned.id = getUnique();
   el.tasklist.append(cloned);
 
   // data may be an event or an array
-  if (Array.isArray(data)) {
+  if (data) {
     colourIndex = ((colourIndex + 1) % colours.length);
     cloned.querySelector('[name=name]').value = data.name;
+    cloned.querySelector('[name=fg]').value = data.color;
     cloned.querySelector('[name=bg]').value = data.bg;
-    cloned.querySelector('[name=from]').value = data.from;
-    cloned.querySelector('[name=to]').value = data.to;
+    cloned.querySelector('[name=from]').valueAsDate = new Date(data.start);
+    cloned.querySelector('[name=to]').valueAsDate = new Date(data.end);
     cloned.querySelector('[name=layer]').value = data.layer;
   } else {
     colourIndex = ((colourIndex + 1) % colours.length);
@@ -160,7 +164,7 @@ function gatherInputData() {
   retval.endDate = new Date(Math.max(...keyDates.concat(taskEndDates, domEndDate).map(d => Number(d))));
 
   // todo find why the scale scales things more than expected
-  retval.dayWidth = el.daywidth.value / 4;
+  retval.dayWidth = el.daywidth.valueAsNumber / 10;
   retval.baseColor = el.basecolor.value;
 
   return retval;
@@ -460,6 +464,11 @@ function addDataToUI(data) {
       addKeyDate(kd);
     }
   }
+
+  if (data.startDate) el.datefrom.valueAsDate = new Date(data.startDate);
+  if (data.endDate) el.dateto.valueAsDate = new Date(data.endDate);
+  if (data.baseColor) el.basecolor.value = data.baseColor;
+  if (data.dayWidth) el.daywidth.value = data.dayWidth * 10;
   redraw();
 }
 
