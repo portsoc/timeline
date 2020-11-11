@@ -358,13 +358,6 @@ function draw(data, editControls) {
   }
 }
 
-function wrapWithAnchor(el, href) {
-  if (!href) return el;
-  const a = svg('a', { href });
-  a.append(el);
-  return a;
-}
-
 function makeVisible(elem) {
   elem.scrollIntoView({ behavior: 'smooth', block: 'center' });
   elem.classList.add('highlight');

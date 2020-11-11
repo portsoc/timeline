@@ -49,3 +49,7 @@ g.button,
 .key-date .date {
   font-weight: bold;
 }
+
+a[href]:hover text {
+  text-decoration: underline;
+}
