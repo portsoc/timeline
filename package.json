@@ -4,7 +4,9 @@
   "description": "time line image generator",
   "main": "index.js",
   "scripts": {
-    "start": "http-server ."
+    "start": "http-server .",
+    "test": "npm run lint",
+    "lint": "eslint ."
   },
   "repository": {
     "type": "git",
