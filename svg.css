@@ -36,12 +36,6 @@ g.button text {
   dominant-baseline: central;
 }
 
-g.button,
-.key-date,
-.task {
-  cursor: pointer;
-}
-
 .key-date {
   fill: var(--basecolor);
 }
@@ -52,4 +46,8 @@ g.button,
 
 a[href]:hover text {
   text-decoration: underline;
+}
+
+a:not([href]) {
+  cursor: default;
 }

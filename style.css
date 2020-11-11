@@ -152,6 +152,12 @@ g.button:hover rect {
   fill: var(--alt-blue);
 }
 
+g.button,
+.key-date,
+.task {
+  cursor: pointer !important;
+}
+
 
 .task, .keydate {
   position: relative;
