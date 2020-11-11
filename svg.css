@@ -32,14 +32,8 @@ g.button text {
   font-size: 110%;
 }
 
-.task>text {
+.task text {
   dominant-baseline: central;
-}
-
-g.button,
-.key-date,
-.task {
-  cursor: pointer;
 }
 
 .key-date {
@@ -48,4 +42,12 @@ g.button,
 
 .key-date .date {
   font-weight: bold;
+}
+
+a[href]:hover text {
+  text-decoration: underline;
+}
+
+a:not([href]) {
+  cursor: default;
 }
