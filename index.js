@@ -187,7 +187,7 @@ function draw(data, editControls) {
   const width = days + barHeight * 10;
   const vertOffset = VERT_OFFSET; // todo auto adjust this
   const leftOffset = barHeight / 2;
-  const taskLayers = Math.max(1, ...data.tasks.map(t => t.layer + (t.height ?? 1)));
+  const taskLayers = Math.max(1, ...data.tasks.map(t => t.layer + t.height));
   const tasksHeight = Math.max(taskHeight * taskLayers, addBtnHeight - taskStart + barHeight);
   const height = vertOffset + taskStart + tasksHeight + 2;
   const editControlsSize = editControls ? 5 * UNIT : 0;
@@ -299,7 +299,7 @@ function draw(data, editControls) {
     const y = taskStart + task.layer * taskHeight;
     const x = dateX(task.start);
     const width = dateX(task.end) - x;
-    const height = taskHeight * Math.max((task.height ?? 1), taskNameLines.length);
+    const height = taskHeight * Math.max(task.height, taskNameLines.length);
     const anchor = svg('a', { id: 'g-' + task.id, class: 'task' });
     if (task.link) {
       anchor.setAttribute('href', task.link);
