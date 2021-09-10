@@ -294,10 +294,11 @@ function draw(data, editControls) {
   }
 
   function drawTask(task) {
+    const taskNameLines = task.name.split('\\n');
     const y = taskStart + task.layer * taskHeight;
     const x = dateX(task.start);
     const width = dateX(task.end) - x;
-    const height = taskHeight * (task.height ?? 1);
+    const height = taskHeight * Math.max((task.height ?? 1), taskNameLines.length);
     const anchor = svg('a', { id: 'g-' + task.id, class: 'task' });
     if (task.link) {
       anchor.setAttribute('href', task.link);
@@ -312,13 +313,24 @@ function draw(data, editControls) {
       rx: 4,
       fill: task.bg,
     });
+
     const textEl = svg('text', {
       x: x + width / 2,
       y: y + taskHeight / 2,
       style: `fill: ${task.color}`,
       'text-anchor': 'middle',
     });
-    textEl.textContent = task.name;
+
+    for (let i = 0; i < taskNameLines.length; i += 1) {
+      const line = taskNameLines[i];
+      const lineEl = svg('tspan', {
+        x: x + width / 2,
+        y: y + i * taskHeight + taskHeight / 2,
+      });
+
+      lineEl.textContent = line;
+      textEl.append(lineEl);
+    }
 
     if (editControls) anchor.addEventListener('click', editThis);
     anchor.append(barEl, textEl);
