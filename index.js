@@ -74,12 +74,13 @@ function addKeyDate(data) {
 }
 
 function addTask(data) {
+  // addTask may get an event, in which case it's adding a new empty task
   if (data instanceof Event) data = null;
+
   const cloned = document.importNode(el.tasktemplate.content, true).firstElementChild;
   cloned.id = getUnique();
   el.tasklist.append(cloned);
 
-  // data may be an event or an array
   if (data) {
     colourIndex = ((colourIndex + 1) % colours.length);
     cloned.querySelector('[name=name]').value = data.name;
