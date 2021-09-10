@@ -111,7 +111,7 @@ function redraw() {
   el.timeline = draw(timelineData, true);
   el.timelinecontainer.append(el.timeline);
 
-  updateDownloadLink(draw(timelineData, false));
+  updateDownloadLink(draw(timelineData, false), timelineData);
   updateDownloadJSONLink();
 }
 
@@ -406,7 +406,7 @@ function svg(name, attributes = {}) {
 
 let css;
 
-async function updateDownloadLink(svgElement) {
+async function updateDownloadLink(svgElement, timelineData) {
   try {
     // load CSS if we haven't already
     if (css == null) {
@@ -423,7 +423,7 @@ async function updateDownloadLink(svgElement) {
     // now update the download URL
     let svgContent = clone.outerHTML;
 
-    svgContent += '<!-- sEpArAtOr' + JSON.stringify(gatherInputData()) + 'sEpArAtOr -->';
+    svgContent += '<!-- sEpArAtOr' + JSON.stringify(timelineData) + 'sEpArAtOr -->';
 
     const encodedUri = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgContent);
     el.downloadsvg.href = encodedUri;
