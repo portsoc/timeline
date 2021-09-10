@@ -184,7 +184,7 @@ function draw(data, editControls) {
 
   const width = days + barHeight * 10;
   const vertOffset = VERT_OFFSET; // todo auto adjust this
-  const leftOffset = barHeight;
+  const leftOffset = barHeight / 2;
   const taskLayers = Math.max(0, ...data.tasks.map(t => t.layer)) + 1;
   const tasksHeight = Math.max(taskHeight * taskLayers, addBtnHeight - taskStart + barHeight);
   const height = vertOffset + taskStart + tasksHeight + 2;
@@ -205,7 +205,7 @@ function draw(data, editControls) {
   // todo add clicking on the bar
   const barEl = svg('path', {
     id: 'bar',
-    d: `M${-leftOffset},0 H${days + leftOffset} L${days + leftOffset + halfBarHeight},${halfBarHeight} L${days + leftOffset},${barHeight} H${-barHeight} z`,
+    d: `M${-leftOffset},0 H${days + leftOffset} L${days + leftOffset + halfBarHeight},${halfBarHeight} L${days + leftOffset},${barHeight} H${-leftOffset} z`,
   });
   drawing.append(barEl);
 
