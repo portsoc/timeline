@@ -180,7 +180,6 @@ function draw(data, editControls) {
   const halfBarHeight = barHeight / 2;
   const taskHeight = UNIT * 1.4;
   const taskStart = barHeight * 1.5;
-  const taskPad = UNIT * 0.2;
 
   const addBtnHeight = UNIT * 9;
 
@@ -314,9 +313,10 @@ function draw(data, editControls) {
       fill: task.bg,
     });
     const textEl = svg('text', {
-      x: x + taskPad,
+      x: x + width / 2,
       y: y + taskHeight / 2,
       style: `fill: ${task.color}`,
+      'text-anchor': 'middle',
     });
     textEl.textContent = task.name;
 
