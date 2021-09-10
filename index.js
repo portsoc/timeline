@@ -88,6 +88,7 @@ function addTask(data) {
     cloned.querySelector('[name=from]').valueAsDate = new Date(data.start);
     cloned.querySelector('[name=to]').valueAsDate = new Date(data.end);
     cloned.querySelector('[name=layer]').value = data.layer;
+    cloned.querySelector('[name=height]').value = data.height ?? 1;
   } else {
     colourIndex = ((colourIndex + 1) % colours.length);
     cloned.querySelector('[name=bg]').value = colours[colourIndex];
@@ -128,7 +129,8 @@ function gatherInputData() {
       end: new Date(getNameValue(taskform, 'to')),
       bg: getNameValue(taskform, 'bg'),
       color: getNameValue(taskform, 'fg'),
-      layer: getNameValue(taskform, 'layer'),
+      layer: Number(getNameValue(taskform, 'layer')),
+      height: Number(getNameValue(taskform, 'height')),
       link: getNameValue(taskform, 'link'),
     };
     retval.tasks.push(task);
@@ -185,7 +187,7 @@ function draw(data, editControls) {
   const width = days + barHeight * 10;
   const vertOffset = VERT_OFFSET; // todo auto adjust this
   const leftOffset = barHeight / 2;
-  const taskLayers = Math.max(0, ...data.tasks.map(t => t.layer)) + 1;
+  const taskLayers = Math.max(1, ...data.tasks.map(t => t.layer + (t.height ?? 1)));
   const tasksHeight = Math.max(taskHeight * taskLayers, addBtnHeight - taskStart + barHeight);
   const height = vertOffset + taskStart + tasksHeight + 2;
   const editControlsSize = editControls ? 5 * UNIT : 0;
@@ -296,6 +298,7 @@ function draw(data, editControls) {
     const y = taskStart + task.layer * taskHeight;
     const x = dateX(task.start);
     const width = dateX(task.end) - x;
+    const height = taskHeight * (task.height ?? 1);
     const anchor = svg('a', { id: 'g-' + task.id, class: 'task' });
     if (task.link) {
       anchor.setAttribute('href', task.link);
@@ -306,7 +309,7 @@ function draw(data, editControls) {
       x,
       y,
       width,
-      height: taskHeight,
+      height,
       rx: 4,
       fill: task.bg,
     });
